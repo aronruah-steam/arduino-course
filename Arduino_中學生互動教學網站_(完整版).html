@@ -1,0 +1,3134 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="artifact-type" content="narrative">
+  <meta name="design-style" content="bauhaus">
+  <title>Arduino 創客實驗室｜中學生互動電子與感測實作指南</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@1.43.0/dist/umd/lucide.min.js"></script>
+
+  <style>
+    :root {
+      color-scheme: light;
+
+      /* 1. Bauhaus Palette */
+      --background: #f5f0e8;
+      --surface-container-low: #f2ede5;
+      --surface-container: #eee9e0;
+      --surface-container-high: #e8e3da;
+
+      --on-surface: #1a1a1a;
+      --on-surface-variant: #4a4a4a;
+
+      --outline: #1a1a1a;
+      --outline-variant: #d0cbc3;
+
+      --primary: #1a1a1a;
+      --on-primary: #ffffff;
+      --primary-container: #ffcc00;
+      --on-primary-container: #1a1a1a;
+      --secondary: #e63b2e;
+      --tertiary: #0055ff;
+      --on-tertiary: #ffffff;
+      --error: #cc0000;
+      --on-error: #ffffff;
+
+      /* Data & hardware diagram tokens */
+      --data-1: #e63b2e;
+      --data-2: #0055ff;
+      --data-3: #1a1a1a;
+      --data-4: #9a7300;
+      --data-context: #b5afa5;
+
+      /* Shared semantic tokens */
+      --positive: #15803d;
+      --on-positive: #ffffff;
+      --warning: #b45309;
+      --focus: #0055ff;
+
+      /* Hardware schematic & code editor tokens */
+      --pcb-blue: #006680;
+      --pcb-dark: #004457;
+      --pcb-silver: #d4d4d8;
+      --pcb-gold: #eab308;
+      --breadboard-bg: #fcfaf5;
+      --breadboard-gutter: #e2ddd3;
+      --breadboard-hole: #262626;
+      --wire-red: #e63b2e;
+      --wire-blue: #0055ff;
+      --wire-yellow: #eab308;
+      --wire-green: #16a34a;
+      --wire-orange: #ea580c;
+      --wire-purple: #7c3aed;
+      --led-off: #9ca3af;
+      --led-red-on: #ff2e20;
+      --led-yellow-on: #ffd000;
+      --led-green-on: #22c55e;
+      --led-blue-on: #2563eb;
+      --led-white-on: #fef08a;
+      --code-bg: #1a1a1a;
+      --code-fg: #f5f0e8;
+      --code-line-hover: #2d2d2d;
+      --code-line-active: #3a3300;
+      --code-kw: #ffcc00;
+      --code-fn: #60a5fa;
+      --code-num: #fca5a5;
+      --code-cmt: #a8a29e;
+
+      /* Typography */
+      --font-headline: 'Noto Sans TC', 'Space Grotesk', sans-serif;
+      --font-body: 'Noto Sans TC', sans-serif;
+      --font-label: 'Space Grotesk', 'Noto Sans TC', sans-serif;
+      --font-mono: 'JetBrains Mono', 'Noto Sans TC', monospace;
+
+      --display-size: clamp(2.35rem, 1.4rem + 3.4vw, 4.25rem);
+      --headline-size: clamp(1.65rem, 1.15rem + 1.8vw, 2.35rem);
+      --subhead-size: clamp(1.15rem, 1rem + 0.55vw, 1.4rem);
+      --body-size: clamp(1rem, 0.96rem + 0.2vw, 1.1rem);
+      --label-size: clamp(0.75rem, 0.72rem + 0.12vw, 0.84rem);
+
+      /* Shape */
+      --rounded: 0.125rem;
+      --rounded-lg: 0.25rem;
+      --rounded-full: 0.75rem;
+
+      /* Bauhaus effects */
+      --border-thick: 3px solid var(--outline);
+      --border-medium: 2px solid var(--outline);
+      --offset-shadow: 5px 5px 0 var(--outline);
+      --offset-shadow-sm: 3px 3px 0 var(--outline);
+      --rule-heavy: 6px solid var(--outline);
+
+      /* Spacing scale */
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2.5rem;
+      --space-2xl: 4rem;
+      --space-3xl: 6rem;
+
+      /* Motion */
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+      --dur-micro: 120ms;
+      --dur-short: 220ms;
+      --dur-long: 420ms;
+    }
+
+    /* Base reset */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      overflow-x: clip;
+      margin: 0;
+      padding: 0;
+      background-color: var(--background);
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+      line-height: 1.65;
+      scroll-behavior: smooth;
+    }
+    header { position: static !important; }
+    button, input, select, textarea { font-family: inherit; }
+
+    /* Focus rings */
+    :focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .page-grid {
+      display: grid;
+      gap: var(--space-xl);
+      padding: var(--space-lg);
+      max-width: 1200px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    .page-grid * { min-width: 0; }
+
+    /* Typography helpers */
+    h1, h2, h3, h4 {
+      font-family: var(--font-headline);
+      font-weight: 900;
+      margin: 0;
+      color: var(--on-surface);
+    }
+    p { margin: 0 0 var(--space-md) 0; max-width: 65ch; }
+    p:last-child { margin-bottom: 0; }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+      background: var(--surface-container-high);
+      padding: 0.1em 0.35em;
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--rounded);
+    }
+
+    /* Bauhaus Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      min-height: 44px;
+      padding: var(--space-sm) var(--space-md);
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: var(--label-size);
+      letter-spacing: 0.04em;
+      border: var(--border-thick);
+      border-radius: var(--rounded);
+      box-shadow: var(--offset-shadow-sm);
+      background: var(--surface-container-low);
+      color: var(--on-surface);
+      cursor: pointer;
+      transition: transform var(--dur-micro) var(--ease-out),
+                  box-shadow var(--dur-micro) var(--ease-out),
+                  background-color var(--dur-micro) var(--ease-out),
+                  color var(--dur-micro) var(--ease-out);
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+    }
+    .btn-blue {
+      background: var(--tertiary);
+      color: var(--on-tertiary);
+    }
+    .btn-positive {
+      background: var(--positive);
+      color: var(--on-positive);
+    }
+    .btn:hover:not(:disabled) {
+      background: var(--primary);
+      color: var(--on-primary);
+      transform: translate(-1px, -1px);
+      box-shadow: var(--offset-shadow);
+    }
+    .btn:active:not(:disabled) {
+      transform: translate(3px, 3px);
+      box-shadow: none;
+    }
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .btn.is-active {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+    }
+
+    /* Bauhaus Cards / Blocks */
+    .block {
+      border: var(--border-thick);
+      border-radius: var(--rounded);
+      box-shadow: var(--offset-shadow);
+      background: var(--surface-container-low);
+      padding: var(--space-lg);
+    }
+    .block-yellow {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+    }
+    .block-blue {
+      background: var(--tertiary);
+      color: var(--on-tertiary);
+    }
+    .block-blue h3, .block-blue p, .block-blue .caption {
+      color: var(--on-tertiary);
+    }
+    .block-inset {
+      border: var(--border-medium);
+      background: var(--surface-container);
+      padding: var(--space-md);
+      border-radius: var(--rounded);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: var(--label-size);
+      padding: 0.2rem 0.55rem;
+      border: var(--border-medium);
+      border-radius: var(--rounded);
+      background: var(--surface-container-low);
+      color: var(--on-surface);
+    }
+    .tag-yellow {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+    }
+    .tag-blue {
+      background: var(--tertiary);
+      color: var(--on-tertiary);
+    }
+    .tag-black {
+      background: var(--primary);
+      color: var(--on-primary);
+    }
+    .tag-green {
+      background: var(--positive);
+      color: var(--on-positive);
+    }
+
+    /* Header & Asymmetric Masthead */
+    .masthead {
+      display: grid;
+      grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr);
+      gap: var(--space-lg);
+      align-items: start;
+      border-bottom: var(--rule-heavy);
+      padding-bottom: var(--space-xl);
+    }
+    .title {
+      font-size: var(--display-size);
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      margin-bottom: var(--space-md);
+    }
+    .title mark {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      padding: 0 var(--space-sm);
+      border: var(--border-thick);
+      box-decoration-break: clone;
+    }
+    .lede {
+      font-size: var(--subhead-size);
+      color: var(--on-surface-variant);
+      max-width: 58ch;
+      margin-bottom: var(--space-lg);
+    }
+    .nav-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+
+    /* Progress Tracker Card */
+    .progress-card {
+      display: grid;
+      gap: var(--space-md);
+    }
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: var(--space-sm);
+    }
+    .key-figure {
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: clamp(2rem, 1.6rem + 1.5vw, 2.75rem);
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+    .progress-track {
+      height: 18px;
+      border: var(--border-medium);
+      background: var(--surface-container-high);
+      position: relative;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--tertiary);
+      transition: width var(--dur-short) var(--ease-out);
+    }
+    .progress-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Section openings (One-accent rule) */
+    .section-open {
+      --accent: var(--tertiary);
+      border-top: var(--space-sm) solid var(--accent);
+      padding-top: var(--space-lg);
+      margin-top: var(--space-md);
+      display: grid;
+      gap: var(--space-sm);
+    }
+    .section-open.accent-red { --accent: var(--secondary); }
+    .section-open.accent-blue { --accent: var(--tertiary); }
+    .section-open.accent-yellow { --accent: var(--primary-container); }
+    .section-open.accent-black { --accent: var(--primary); }
+
+    .kicker {
+      display: inline-block;
+      width: fit-content;
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: var(--label-size);
+      letter-spacing: 0.06em;
+      background: var(--primary);
+      color: var(--on-primary);
+      padding: var(--space-xs) var(--space-sm);
+    }
+    .section-open.accent-blue .kicker {
+      background: var(--tertiary);
+      color: var(--on-tertiary);
+    }
+    .section-open.accent-yellow .kicker {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      border: var(--border-medium);
+    }
+    .section-heading {
+      font-size: var(--headline-size);
+      line-height: 1.15;
+    }
+    .section-desc {
+      color: var(--on-surface-variant);
+      max-width: 65ch;
+    }
+
+    /* Grids */
+    .grid-2-1 {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: var(--space-lg);
+      align-items: start;
+    }
+    .grid-1-2 {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.55fr);
+      gap: var(--space-lg);
+      align-items: start;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+      gap: var(--space-lg);
+    }
+
+    /* Form Controls (Bauhaus bottom-border inputs & sliders) */
+    .field-group {
+      display: grid;
+      gap: var(--space-xs);
+    }
+    .field-label {
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: var(--label-size);
+      color: var(--on-surface);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .bauhaus-input, .bauhaus-select {
+      width: 100%;
+      min-height: 44px;
+      padding: var(--space-sm) var(--space-md);
+      background: var(--surface-container-low);
+      border: none;
+      border-bottom: var(--border-thick);
+      border-radius: 0;
+      color: var(--on-surface);
+      font-size: var(--body-size);
+      font-weight: 700;
+    }
+    .bauhaus-select { padding-right: var(--space-xl); }
+    .bauhaus-input:focus, .bauhaus-select:focus {
+      border-bottom-color: var(--tertiary);
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--tertiary);
+      height: 36px;
+      cursor: pointer;
+    }
+
+    /* Formula & Readout Strip */
+    .readout-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-md);
+      border-top: var(--border-thick);
+      padding-top: var(--space-md);
+    }
+    .readout-item .label {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 700;
+      color: var(--on-surface-variant);
+    }
+    .readout-item .val {
+      font-family: var(--font-mono);
+      font-size: 1.45rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Status Banners (using accessible colors, never raw red text) */
+    .status-banner {
+      padding: var(--space-md);
+      border: var(--border-thick);
+      font-weight: 700;
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-sm);
+    }
+    .status-safe {
+      background: var(--surface-container-low);
+      border-left: 8px solid var(--positive);
+      color: var(--on-surface);
+    }
+    .status-warn {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+    }
+    .status-danger {
+      background: var(--error);
+      color: var(--on-error);
+    }
+
+    /* Breadboard interactive SVG */
+    .svg-stage {
+      width: 100%;
+      border: var(--border-thick);
+      background: var(--surface-container);
+      padding: var(--space-md);
+      overflow-x: auto;
+    }
+    .svg-stage svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-width: 100%;
+    }
+    .bb-zone {
+      cursor: pointer;
+      transition: opacity var(--dur-micro) var(--ease-out);
+    }
+    .bb-zone:hover { opacity: 0.85; }
+
+    /* Arduino Uno Interactive Pins */
+    .uno-hotspot {
+      cursor: pointer;
+      transition: transform var(--dur-micro) var(--ease-out);
+    }
+    .uno-hotspot:hover rect, .uno-hotspot:hover circle {
+      stroke: var(--primary-container);
+      stroke-width: 3px;
+    }
+
+    /* Tables */
+    .bauhaus-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+    .bauhaus-table th {
+      text-align: left;
+      background: var(--surface-container-high);
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: var(--label-size);
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: var(--border-thick);
+    }
+    .bauhaus-table td {
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: 1px solid var(--outline-variant);
+      vertical-align: top;
+    }
+
+    /* Code Viewer with Line-by-line Interactive Inspector */
+    .code-workbench {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+      gap: var(--space-md);
+      align-items: stretch;
+    }
+    .code-panel {
+      background: var(--code-bg);
+      color: var(--code-fg);
+      border: var(--border-thick);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.6;
+      overflow-x: auto;
+      padding: var(--space-sm) 0;
+    }
+    .code-line {
+      display: grid;
+      grid-template-columns: 3rem minmax(0, 1fr);
+      padding: 0.15rem var(--space-md) 0.15rem 0;
+      cursor: pointer;
+      border-left: 4px solid transparent;
+      transition: background-color var(--dur-micro) var(--ease-out);
+    }
+    .code-line:hover {
+      background: var(--code-line-hover);
+    }
+    .code-line.is-selected {
+      background: var(--code-line-active);
+      border-left-color: var(--primary-container);
+    }
+    .code-ln {
+      text-align: right;
+      padding-right: var(--space-md);
+      color: var(--code-cmt);
+      user-select: none;
+    }
+    .code-txt {
+      white-space: pre;
+    }
+    .code-explain-box {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: var(--space-md);
+    }
+
+    /* Sensor Tabs & Experiment Selector Cards */
+    .tab-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+    .lab-overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr));
+      gap: var(--space-md);
+    }
+    .lab-card-btn {
+      text-align: left;
+      display: grid;
+      gap: var(--space-xs);
+      align-content: space-between;
+      padding: var(--space-md);
+      border: var(--border-thick);
+      border-radius: var(--rounded);
+      box-shadow: var(--offset-shadow-sm);
+      background: var(--surface-container-low);
+      color: var(--on-surface);
+      cursor: pointer;
+      min-height: 132px;
+      transition: transform var(--dur-micro) var(--ease-out),
+                  box-shadow var(--dur-micro) var(--ease-out),
+                  background-color var(--dur-micro) var(--ease-out);
+    }
+    .lab-card-btn:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: var(--offset-shadow);
+    }
+    .lab-card-btn.is-active {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+    }
+
+    /* Lifecycle stepper */
+    .step-list {
+      display: grid;
+      gap: var(--space-sm);
+    }
+    .step-item {
+      padding: var(--space-sm) var(--space-md);
+      border: var(--border-medium);
+      background: var(--surface-container-low);
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      transition: background-color var(--dur-micro) var(--ease-out);
+    }
+    .step-item.is-running {
+      background: var(--primary-container);
+      border-width: 3px;
+    }
+    .step-num {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary);
+      color: var(--on-primary);
+      flex-shrink: 0;
+    }
+
+    /* Piano keys */
+    .piano-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: var(--space-sm);
+    }
+    .piano-key {
+      min-height: 92px;
+      border: var(--border-thick);
+      box-shadow: var(--offset-shadow-sm);
+      background: var(--surface-container-low);
+      color: var(--on-surface);
+      font-weight: 900;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+      cursor: pointer;
+      transition: transform var(--dur-micro) var(--ease-out),
+                  background-color var(--dur-micro) var(--ease-out);
+    }
+    .piano-key:hover, .piano-key.is-pressed {
+      background: var(--primary-container);
+      transform: translate(2px, 2px);
+      box-shadow: none;
+    }
+
+    /* Quiz options */
+    .quiz-grid {
+      display: grid;
+      gap: var(--space-lg);
+    }
+    .quiz-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+      gap: var(--space-sm);
+      margin-top: var(--space-sm);
+    }
+    .quiz-opt {
+      justify-content: flex-start;
+      text-align: left;
+      font-family: var(--font-body);
+      font-weight: 500;
+    }
+    .quiz-opt.is-correct {
+      background: var(--positive);
+      color: var(--on-positive);
+    }
+    .quiz-opt.is-wrong {
+      background: var(--error);
+      color: var(--on-error);
+    }
+
+    /* Details / Challenge Disclosure */
+    details.challenge-box {
+      border: var(--border-thick);
+      background: var(--surface-container);
+      padding: var(--space-md);
+    }
+    details.challenge-box summary {
+      font-family: var(--font-headline);
+      font-weight: 700;
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 44px;
+    }
+    details.challenge-box[open] summary {
+      border-bottom: var(--border-medium);
+      padding-bottom: var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+
+    /* Footer */
+    .site-footer {
+      border-top: var(--rule-heavy);
+      padding-top: var(--space-xl);
+      padding-bottom: var(--space-2xl);
+      display: grid;
+      gap: var(--space-sm);
+      color: var(--on-surface-variant);
+      font-size: 0.92rem;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 860px) {
+      .masthead, .grid-2-1, .grid-1-2, .code-workbench {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 640px) {
+      .page-grid {
+        padding: var(--space-md);
+        gap: var(--space-lg);
+      }
+      .readout-row {
+        grid-template-columns: 1fr;
+      }
+      .piano-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-grid">
+
+    <!-- MASTHEAD -->
+    <header class="masthead">
+      <div>
+        <div class="tag tag-black" style="margin-bottom: var(--space-md);">國中・高中生 Arduino 互動實作課程</div>
+        <h1 class="title">打造你的第一個 <mark>Arduino</mark> 感測實驗室</h1>
+        <p class="lede">從電壓電流、麵包板導通原理、Uno 腳位結構到五大感測器互動實作，結合虛擬硬體模擬器與逐行程式碼解析，帶你零基礎踏入物理計算的世界。</p>
+        <nav class="nav-strip" aria-label="章節快速導覽">
+          <a class="btn btn-primary" href="#sec-electronics"><i data-lucide="zap" width="16" height="16"></i> 01 電學與麵包板</a>
+          <a class="btn" href="#sec-arduino"><i data-lucide="cpu" width="16" height="16"></i> 02 Arduino Uno 核心</a>
+          <a class="btn" href="#sec-sensors"><i data-lucide="radio" width="16" height="16"></i> 03 常見感測器圖鑑</a>
+          <a class="btn btn-blue" href="#sec-labs"><i data-lucide="flask-conical" width="16" height="16"></i> 04 五大實作實驗</a>
+          <a class="btn" href="#sec-quiz"><i data-lucide="check-square" width="16" height="16"></i> 05 觀念小測驗</a>
+        </nav>
+      </div>
+
+      <aside class="block progress-card" aria-label="學習進度追蹤">
+        <div class="progress-header">
+          <span class="tag tag-yellow">自主學習進度</span>
+          <span id="progress-ratio" class="key-figure">0 / 5</span>
+        </div>
+        <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0" id="progress-bar-wrap">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <p id="progress-status" style="font-size: 0.92rem; color: var(--on-surface-variant);">尚未勾選完成實驗。進入下方實驗工作台並完成實作即可紀錄進度。</p>
+        <div class="progress-actions">
+          <span class="tag" id="quiz-score-badge">隨堂測驗：0 / 5 題</span>
+          <button type="button" class="btn" id="btn-reset-progress" onclick="handleResetProgress(this)">重設紀錄</button>
+        </div>
+      </aside>
+    </header>
+
+    <!-- SECTION 01: BASIC ELECTRONICS & BREADBOARD -->
+    <section id="sec-electronics">
+      <div class="section-open accent-blue">
+        <span class="kicker">PART 01 · 電學基本知識與安全規範</span>
+        <h2 class="section-heading">掌握電壓、電流與電阻，看懂麵包板如何讓電路通起來</h2>
+        <p class="section-desc">在接上任何電子元件之前，先搞懂電路的三大基本物理量與歐姆定律，就能避開燒毀 LED 或晶片短路的常見新手意外。</p>
+      </div>
+
+      <!-- 4 Core Concepts -->
+      <div class="card-grid" style="margin-top: var(--space-lg);">
+        <article class="block">
+          <div class="tag tag-blue" style="margin-bottom: var(--space-sm);">V · 伏特 (Volt)</div>
+          <h3 style="margin-bottom: var(--space-xs);">電壓 Voltage</h3>
+          <p>好比水塔的水壓差，推動電子在導線中流動的驅動力。Arduino Uno 的數位腳位高電位 (<code>HIGH</code>) 是 <strong>5V</strong>，低電位 (<code>LOW</code>) 是 <strong>0V</strong>（接地 <code>GND</code>）。</p>
+        </article>
+        <article class="block">
+          <div class="tag tag-yellow" style="margin-bottom: var(--space-sm);">I · 安培 / 毫安 (mA)</div>
+          <h3 style="margin-bottom: var(--space-xs);">電流 Current</h3>
+          <p>每秒通過導線截面的電子流量。一般 5mm LED 安全工作電流約 <strong>10–20 mA</strong>；Arduino Uno 單一腳位建議最大輸出為 <strong>20 mA</strong>（極限 40 mA）。</p>
+        </article>
+        <article class="block">
+          <div class="tag tag-black" style="margin-bottom: var(--space-sm);">R · 歐姆 (Ω)</div>
+          <h3 style="margin-bottom: var(--space-xs);">電阻 Resistance</h3>
+          <p>阻礙電流通過的能力，用來「限流」保護元件或進行分壓。實驗最常使用 <strong>220Ω</strong>（紅紅棕金）保護 LED，以及 <strong>10kΩ</strong>（棕黑橙金）搭配按鍵與光敏電阻。</p>
+        </article>
+        <article class="block block-yellow">
+          <div class="tag tag-black" style="margin-bottom: var(--space-sm);">核心公式</div>
+          <h3 style="margin-bottom: var(--space-xs);">歐姆定律 V = I × R</h3>
+          <p>電流與電壓成正比、與電阻成反比。若 5V 電源接紅光 LED（壓降約 2V）並串聯 220Ω 電阻，電流約為 <code>(5 - 2) / 220 = 13.6 mA</code>，安全又夠亮！</p>
+        </article>
+      </div>
+
+      <!-- Interactive Lab 1A: Ohm's Law & Short/Open Circuit Safety -->
+      <div class="grid-2-1" style="margin-top: var(--space-xl);">
+        <div class="block">
+          <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-sm); margin-bottom: var(--space-md);">
+            <h3>互動實驗 1A：歐姆定律與電路安全模擬器</h3>
+            <div class="tab-bar" role="group" aria-label="切換電路狀態">
+              <button type="button" class="btn is-active" id="ohm-mode-normal" onclick="setOhmMode('normal')">正常限流電路</button>
+              <button type="button" class="btn" id="ohm-mode-open" onclick="setOhmMode('open')">開路（斷線）</button>
+              <button type="button" class="btn" id="ohm-mode-short" onclick="setOhmMode('short')">無電阻／短路危險</button>
+            </div>
+          </div>
+
+          <div class="grid-1-2" style="gap: var(--space-md); align-items: center;">
+            <div class="svg-stage" style="padding: var(--space-sm);">
+              <svg viewBox="0 0 300 210" aria-label="LED 與電阻測試電路圖">
+                <!-- Power source -->
+                <rect x="20" y="65" width="54" height="80" fill="var(--surface-container-low)" stroke="var(--outline)" stroke-width="3"/>
+                <text x="47" y="100" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="14" fill="var(--on-surface)" id="svg-ohm-v">5.0V</text>
+                <text x="47" y="122" text-anchor="middle" font-family="var(--font-label)" font-size="10" fill="var(--on-surface-variant)">電源</text>
+
+                <!-- Wires -->
+                <path d="M47,65 L47,30 L125,30" fill="none" stroke="var(--wire-red)" stroke-width="4"/>
+                <path id="svg-wire-gap" d="M125,30 L165,30" fill="none" stroke="var(--wire-red)" stroke-width="4"/>
+                <path d="M165,30 L250,30 L250,82" fill="none" stroke="var(--wire-red)" stroke-width="4"/>
+                <path d="M250,128 L250,180 L47,180 L47,145" fill="none" stroke="var(--wire-blue)" stroke-width="4"/>
+
+                <!-- Resistor symbol -->
+                <g id="svg-resistor-grp">
+                  <rect x="115" y="18" width="60" height="24" fill="var(--primary-container)" stroke="var(--outline)" stroke-width="2.5"/>
+                  <text x="145" y="34" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="11" fill="var(--on-primary-container)" id="svg-ohm-r">220Ω</text>
+                </g>
+
+                <!-- Open switch indicator (hidden unless open) -->
+                <g id="svg-open-grp" style="display: none;">
+                  <line x1="120" y1="30" x2="158" y2="10" stroke="var(--wire-red)" stroke-width="4"/>
+                  <circle cx="120" cy="30" r="4" fill="var(--outline)"/>
+                  <circle cx="165" cy="30" r="4" fill="var(--outline)"/>
+                  <text x="143" y="54" text-anchor="middle" font-family="var(--font-body)" font-weight="700" font-size="11" fill="var(--on-surface)">斷開 (開路)</text>
+                </g>
+
+                <!-- LED Lamp -->
+                <g transform="translate(250, 105)">
+                  <circle id="svg-ohm-halo" cx="0" cy="0" r="30" fill="var(--led-red-on)" opacity="0.25"/>
+                  <circle id="svg-ohm-led" cx="0" cy="0" r="18" fill="var(--led-red-on)" stroke="var(--outline)" stroke-width="3"/>
+                  <text x="0" y="35" text-anchor="middle" font-family="var(--font-label)" font-weight="700" font-size="11" fill="var(--on-surface)" id="svg-ohm-led-lbl">LED 正常發光</text>
+                </g>
+              </svg>
+            </div>
+
+            <div style="display: grid; gap: var(--space-md);">
+              <div class="field-group">
+                <label class="field-label" for="ohm-voltage">
+                  <span>供電電壓 (V)</span>
+                  <span id="ohm-v-display" style="font-family: var(--font-mono);">5.0 V</span>
+                </label>
+                <select id="ohm-voltage" class="bauhaus-select" onchange="updateOhmSim()">
+                  <option value="3.3">3.3 V（Arduino 3.3V 電源腳位）</option>
+                  <option value="5.0" selected>5.0 V（Arduino 數位腳位 HIGH）</option>
+                  <option value="9.0">9.0 V（外部電池供電）</option>
+                </select>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="ohm-resistor">
+                  <span>串聯限流電阻 (R)</span>
+                  <span id="ohm-r-display" style="font-family: var(--font-mono);">220 Ω</span>
+                </label>
+                <input type="range" id="ohm-resistor" min="50" max="1000" step="10" value="220" oninput="updateOhmSim()">
+              </div>
+
+              <div class="readout-row">
+                <div class="readout-item">
+                  <div class="label">預估電流 (I)</div>
+                  <div class="val" id="ohm-current-val">13.6 mA</div>
+                </div>
+                <div class="readout-item">
+                  <div class="label">電阻分壓</div>
+                  <div class="val" id="ohm-drop-val">3.0 V</div>
+                </div>
+                <div class="readout-item">
+                  <div class="label">LED 狀態</div>
+                  <div class="val" id="ohm-state-val" style="font-size: 1.1rem;">亮度適中</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="ohm-banner" class="status-banner status-safe" style="margin-top: var(--space-md);">
+            <i data-lucide="shield-check" width="20" height="20" style="flex-shrink: 0;"></i>
+            <span id="ohm-banner-text">安全運作中：220Ω 電阻將電流限制在 13.6 mA，遠低於 LED 極限（20 mA）與 Arduino 腳位上限。</span>
+          </div>
+        </div>
+
+        <!-- Safety rules card -->
+        <aside class="block" style="display: grid; gap: var(--space-md);">
+          <h3>開路 vs 短路：中學實驗室安全守則</h3>
+          <div class="block-inset">
+            <div class="tag tag-black" style="margin-bottom: var(--space-xs);">開路 Open Circuit</div>
+            <p style="font-size: 0.94rem;">電路沒有形成完整迴路（例如跳線鬆脫、GND 沒接好、LED 長短腳接反）。雖然不會燒毀元件，但電路完全不會動作。</p>
+          </div>
+          <div class="block-inset">
+            <div class="tag tag-yellow" style="margin-bottom: var(--space-xs);">短路 Short Circuit</div>
+            <p style="font-size: 0.94rem;">正極（5V）未經負載直接連回負極（GND），電阻趨近 0Ω 導致電流瞬間暴增，會讓導線發燙、電源重置甚至燒毀電腦 USB 埠！</p>
+          </div>
+          <div class="block-inset">
+            <div class="tag tag-blue" style="margin-bottom: var(--space-xs);">接線鐵則</div>
+            <p style="font-size: 0.94rem;"><strong>修改任何接線前，務必先拔除 USB 傳輸線！</strong>確認紅色正極與黑色接地未直接相連後再通電。</p>
+          </div>
+        </aside>
+      </div>
+
+      <!-- Interactive Lab 1B: Breadboard Internal Bus Explorer -->
+      <div class="block" style="margin-top: var(--space-xl);">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); margin-bottom: var(--space-md);">
+          <div>
+            <h3>互動實驗 1B：麵包板 (Breadboard) 內部導通透視模擬器</h3>
+            <p style="color: var(--on-surface-variant); margin-top: var(--space-xs);">點選麵包板上不同孔位區域，透視面板底下金屬銅片的實際導通方向！</p>
+          </div>
+          <div class="tab-bar" role="group" aria-label="麵包板檢視模式">
+            <button type="button" class="btn is-active" id="bb-btn-power" onclick="selectBreadboardZone('power')">電源軌 (+ / -)</button>
+            <button type="button" class="btn" id="bb-btn-row" onclick="selectBreadboardZone('row')">中央 5 孔群組 (a–e)</button>
+            <button type="button" class="btn" id="bb-btn-gutter" onclick="selectBreadboardZone('gutter')">跨接中央溝槽 (IC區)</button>
+            <button type="button" class="btn" id="bb-btn-mistake" onclick="selectBreadboardZone('mistake')">新手常犯短路錯誤</button>
+          </div>
+        </div>
+
+        <div class="grid-2-1" style="align-items: center;">
+          <div class="svg-stage">
+            <svg viewBox="0 0 640 245" aria-label="麵包板內部導通結構互動圖">
+              <!-- Outer breadboard body -->
+              <rect x="10" y="10" width="620" height="225" rx="6" fill="var(--breadboard-bg)" stroke="var(--outline)" stroke-width="3"/>
+
+              <!-- Top Power Rail (+ / -) -->
+              <line x1="35" y1="26" x2="605" y2="26" stroke="var(--wire-red)" stroke-width="2.5"/>
+              <line x1="35" y1="54" x2="605" y2="54" stroke="var(--wire-blue)" stroke-width="2.5"/>
+              <text x="20" y="34" font-family="var(--font-mono)" font-weight="700" font-size="14" fill="var(--wire-red)">+</text>
+              <text x="20" y="54" font-family="var(--font-mono)" font-weight="700" font-size="14" fill="var(--wire-blue)">-</text>
+
+              <!-- Highlight layer for Power Rail -->
+              <g id="bb-hl-power" opacity="1">
+                <rect x="42" y="29" width="556" height="12" fill="var(--primary-container)" stroke="var(--outline)" stroke-width="2"/>
+                <rect x="42" y="43" width="556" height="12" fill="var(--primary-container)" stroke="var(--outline)" stroke-width="2"/>
+              </g>
+
+              <!-- Center Gutter -->
+              <rect x="12" y="114" width="616" height="18" fill="var(--breadboard-gutter)" stroke="var(--outline-variant)" stroke-width="1"/>
+              <text x="320" y="127" text-anchor="middle" font-family="var(--font-label)" font-weight="700" font-size="10" fill="var(--on-surface-variant)">中央隔離溝槽（上方 a–e 與下方 f–j 彼此絕緣不導通）</text>
+
+              <!-- Highlight layer for 5-hole vertical row -->
+              <g id="bb-hl-row" opacity="0">
+                <rect x="172" y="64" width="16" height="48" fill="var(--primary-container)" stroke="var(--outline)" stroke-width="2"/>
+                <rect x="272" y="135" width="16" height="48" fill="var(--primary-container)" stroke="var(--outline)" stroke-width="2"/>
+              </g>
+
+              <!-- Highlight layer for IC / LED crossing gutter -->
+              <g id="bb-hl-gutter" opacity="0">
+                <rect x="292" y="64" width="16" height="48" fill="var(--tertiary)" opacity="0.3"/>
+                <rect x="292" y="135" width="16" height="48" fill="var(--primary-container)" opacity="0.7"/>
+                <!-- LED crossing gutter -->
+                <line x1="300" y1="98" x2="300" y2="148" stroke="var(--outline)" stroke-width="3"/>
+                <circle cx="300" cy="123" r="11" fill="var(--led-green-on)" stroke="var(--outline)" stroke-width="2.5"/>
+              </g>
+
+              <!-- Highlight layer for Rookie Short Mistake -->
+              <g id="bb-hl-mistake" opacity="0">
+                <rect x="392" y="64" width="16" height="48" fill="var(--error)" opacity="0.35" stroke="var(--error)" stroke-width="2"/>
+                <path d="M400,72 C418,72 418,104 400,104" fill="none" stroke="var(--outline)" stroke-width="3"/>
+                <circle cx="414" cy="88" r="9" fill="var(--error)" stroke="var(--outline)" stroke-width="2"/>
+              </g>
+
+              <!-- Bottom Power Rail -->
+              <line x1="35" y1="191" x2="605" y2="191" stroke="var(--wire-red)" stroke-width="2.5"/>
+              <line x1="35" y1="219" x2="605" y2="219" stroke="var(--wire-blue)" stroke-width="2.5"/>
+              <text x="20" y="199" font-family="var(--font-mono)" font-weight="700" font-size="14" fill="var(--wire-red)">+</text>
+              <text x="20" y="219" font-family="var(--font-mono)" font-weight="700" font-size="14" fill="var(--wire-blue)">-</text>
+
+              <!-- Holes Matrix (Generated cleanly via JS or static SVG patterns) -->
+              <g id="bb-holes-container"></g>
+
+              <!-- Clickable invisible zones -->
+              <rect class="bb-zone" x="35" y="25" width="570" height="32" fill="transparent" onclick="selectBreadboardZone('power')"/>
+              <rect class="bb-zone" x="35" y="64" width="570" height="48" fill="transparent" onclick="selectBreadboardZone('row')"/>
+              <rect class="bb-zone" x="35" y="114" width="570" height="18" fill="transparent" onclick="selectBreadboardZone('gutter')"/>
+              <rect class="bb-zone" x="35" y="135" width="570" height="48" fill="transparent" onclick="selectBreadboardZone('row')"/>
+            </svg>
+          </div>
+
+          <div class="block-inset" style="display: grid; gap: var(--space-sm);">
+            <span class="tag tag-yellow" id="bb-info-tag">水平整排導通</span>
+            <h4 id="bb-info-title" style="font-size: 1.2rem;">上下兩側電源軌（+ 正極 / - 負極）</h4>
+            <p id="bb-info-desc" style="font-size: 0.96rem;">標示紅線（+）與藍線（-）的兩排孔洞，底部的金屬銅片是<strong>「水平一整排連通」</strong>的。通常從 Arduino 的 5V 接一條線到紅色軌，GND 接到藍色軌，整條軌道就能分接給所有元件使用！</p>
+            <div class="tag tag-black" id="bb-info-tip" style="width: fit-content;">提示：少數加長型麵包板正中間會斷開，需視紅藍線是否連續</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 02: ARDUINO UNO HARDWARE & IDE ARCHITECTURE -->
+    <section id="sec-arduino">
+      <div class="section-open accent-red">
+        <span class="kicker">PART 02 · ARDUINO UNO 硬體與程式架構</span>
+        <h2 class="section-heading">認識開源微控制器大腦，看懂數位、類比腳位與程式生命週期</h2>
+        <p class="section-desc">Arduino Uno 基於 ATmega328P 微控制器，是全世界中學生學習物理計算最經典的開發板。點擊下方板載各區域，立即檢視腳位功能與接線規格。</p>
+      </div>
+
+      <!-- Interactive Arduino Uno Diagram -->
+      <div class="grid-1-2" style="margin-top: var(--space-lg);">
+        <div class="block" style="display: grid; gap: var(--space-md);">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: var(--space-sm);">
+            <h3>Uno 六大構造導覽</h3>
+            <span class="tag tag-blue">點擊切換</span>
+          </div>
+          <div class="tab-bar" role="group" aria-label="選擇 Arduino Uno 構造區域">
+            <button type="button" class="btn is-active" id="uno-btn-usb" onclick="selectUnoPart('usb')">1. USB 連接埠</button>
+            <button type="button" class="btn" id="uno-btn-mcu" onclick="selectUnoPart('mcu')">2. 微控制器</button>
+            <button type="button" class="btn" id="uno-btn-digital" onclick="selectUnoPart('digital')">3. 數位腳位 0–13</button>
+            <button type="button" class="btn" id="uno-btn-analog" onclick="selectUnoPart('analog')">4. 類比腳位 A0–A5</button>
+            <button type="button" class="btn" id="uno-btn-power" onclick="selectUnoPart('power')">5. 電源腳位</button>
+            <button type="button" class="btn" id="uno-btn-jack" onclick="selectUnoPart('jack')">6. DC 電源插座</button>
+          </div>
+
+          <div class="block-inset" style="display: grid; gap: var(--space-sm);">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <h4 id="uno-part-title" style="font-size: 1.2rem;">USB Type-B 連接埠</h4>
+              <span class="tag tag-yellow" id="uno-part-badge">供電與燒錄</span>
+            </div>
+            <p id="uno-part-desc" style="font-size: 0.96rem;">透過 USB 傳輸線連接電腦與 Arduino Uno，同時完成兩件事：提供開發板 5V 穩定工作電源，以及將你在 Arduino IDE 寫好的程式碼編譯上傳（燒錄）進晶片裡，並支援序列埠監控除錯。</p>
+            <div style="border-top: 2px solid var(--outline-variant); padding-top: var(--space-sm); font-family: var(--font-mono); font-size: 0.85rem;" id="uno-part-spec">
+              規格：5V DC 輸入｜透過 CH340 / ATmega16U2 晶片轉接 USB-UART
+            </div>
+          </div>
+        </div>
+
+        <div class="svg-stage">
+          <svg viewBox="0 0 540 360" aria-label="Arduino Uno 互動腳位圖">
+            <!-- PCB Board -->
+            <path d="M40,25 L480,25 L505,50 L505,315 L480,335 L40,335 Z" fill="var(--pcb-blue)" stroke="var(--outline)" stroke-width="3.5"/>
+            <!-- Board Title -->
+            <text x="155" y="135" font-family="var(--font-label)" font-weight="700" font-size="22" fill="var(--on-primary)">ARDUINO</text>
+            <text x="155" y="158" font-family="var(--font-label)" font-weight="700" font-size="14" fill="var(--primary-container)">UNO R3</text>
+
+            <!-- 1. USB Port -->
+            <g class="uno-hotspot" onclick="selectUnoPart('usb')">
+              <rect id="uno-box-usb" x="15" y="55" width="75" height="62" fill="var(--pcb-silver)" stroke="var(--primary-container)" stroke-width="4"/>
+              <text x="52" y="90" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="11" fill="var(--on-surface)">USB</text>
+            </g>
+
+            <!-- 6. DC Power Jack -->
+            <g class="uno-hotspot" onclick="selectUnoPart('jack')">
+              <rect id="uno-box-jack" x="15" y="235" width="80" height="62" fill="var(--primary)" stroke="var(--outline)" stroke-width="3"/>
+              <text x="55" y="270" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="11" fill="var(--on-primary)">7–12V DC</text>
+            </g>
+
+            <!-- Reset button -->
+            <rect x="62" y="34" width="22" height="16" fill="var(--pcb-silver)" stroke="var(--outline)" stroke-width="2"/>
+            <circle cx="73" cy="42" r="4" fill="var(--secondary)"/>
+
+            <!-- 2. ATmega328P MCU -->
+            <g class="uno-hotspot" onclick="selectUnoPart('mcu')">
+              <rect id="uno-box-mcu" x="200" y="195" width="225" height="58" fill="var(--primary)" stroke="var(--outline)" stroke-width="3"/>
+              <text x="312" y="220" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="13" fill="var(--on-primary)">ATmega328P-PU</text>
+              <text x="312" y="238" text-anchor="middle" font-family="var(--font-label)" font-size="10" fill="var(--primary-container)">8-bit AVR 核心微控制器 (16MHz)</text>
+            </g>
+
+            <!-- 3. Digital Pins Header (Top) -->
+            <g class="uno-hotspot" onclick="selectUnoPart('digital')">
+              <rect id="uno-box-digital" x="135" y="32" width="335" height="44" fill="var(--pcb-dark)" stroke="var(--outline)" stroke-width="2.5"/>
+              <text x="302" y="49" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="11" fill="var(--on-primary)">DIGITAL (PWM ~)  13  12  ~11  ~10  ~9  8  |  7  ~6  ~5  4  ~3  2  1  0</text>
+              <text x="302" y="67" text-anchor="middle" font-family="var(--font-label)" font-size="10" fill="var(--primary-container)">數位輸入/輸出 (0V / 5V) · 帶 ~ 為 PWM 腳位</text>
+            </g>
+
+            <!-- Built-in LED L -->
+            <circle cx="170" cy="95" r="6" fill="var(--led-yellow-on)" stroke="var(--outline)" stroke-width="2"/>
+            <text x="182" y="99" font-family="var(--font-mono)" font-weight="700" font-size="10" fill="var(--on-primary)">L (Pin 13)</text>
+
+            <!-- 5. Power Pins Header (Bottom Left) -->
+            <g class="uno-hotspot" onclick="selectUnoPart('power')">
+              <rect id="uno-box-power" x="155" y="282" width="150" height="44" fill="var(--pcb-dark)" stroke="var(--outline)" stroke-width="2.5"/>
+              <text x="230" y="300" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="11" fill="var(--on-primary)">3.3V  5V  GND  VIN</text>
+              <text x="230" y="317" text-anchor="middle" font-family="var(--font-label)" font-size="10" fill="var(--primary-container)">POWER 電源與接地腳位</text>
+            </g>
+
+            <!-- 4. Analog Input Pins Header (Bottom Right) -->
+            <g class="uno-hotspot" onclick="selectUnoPart('analog')">
+              <rect id="uno-box-analog" x="325" y="282" width="145" height="44" fill="var(--pcb-dark)" stroke="var(--outline)" stroke-width="2.5"/>
+              <text x="397" y="300" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="11" fill="var(--on-primary)">A0  A1  A2  A3  A4  A5</text>
+              <text x="397" y="317" text-anchor="middle" font-family="var(--font-label)" font-size="10" fill="var(--primary-container)">ANALOG IN (0–1023)</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Arduino IDE & setup() / loop() Stepper -->
+      <div class="grid-2-1" style="margin-top: var(--space-xl);">
+        <div class="block">
+          <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-sm); margin-bottom: var(--space-md);">
+            <h3>程式生命週期步進器：<code>setup()</code> 與 <code>loop()</code></h3>
+            <div style="display: flex; gap: var(--space-sm);">
+              <button type="button" class="btn btn-primary" onclick="stepLifecycle()">下一步執行</button>
+              <button type="button" class="btn" id="btn-auto-life" onclick="toggleAutoLifecycle()">自動循環播放</button>
+            </div>
+          </div>
+
+          <div class="grid-1-2" style="gap: var(--space-md);">
+            <div style="display: grid; gap: var(--space-md); align-content: start;">
+              <div class="block-inset" style="text-align: center; display: grid; gap: var(--space-sm); justify-items: center;">
+                <span class="tag tag-black">板載 LED (Pin 13) 狀態</span>
+                <svg viewBox="0 0 100 100" width="90" height="90" aria-label="板載 LED 模擬狀態">
+                  <circle id="life-led-circle" cx="50" cy="50" r="32" fill="var(--led-off)" stroke="var(--outline)" stroke-width="4"/>
+                  <text id="life-led-text" x="50" y="55" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="14" fill="var(--on-surface)">LOW</text>
+                </svg>
+                <div style="font-family: var(--font-mono); font-size: 0.85rem;" id="life-cycle-count">loop() 執行次數：0</div>
+              </div>
+              <div class="block-inset" style="font-size: 0.92rem;">
+                <strong>核心觀念：</strong><br>
+                <code>setup()</code> 在通電或按下 Reset 後<strong>只執行一次</strong>；接著進入 <code>loop()</code>，只要不斷電就會每秒數千次不斷循環重複！
+              </div>
+            </div>
+
+            <div class="step-list" id="lifecycle-steps">
+              <div class="step-item is-running" data-step="0">
+                <span class="step-num">1</span>
+                <div>
+                  <code>void setup() { pinMode(13, OUTPUT); }</code>
+                  <div style="font-size: 0.85rem; color: var(--on-surface-variant);">開機僅執行 1 次：設定腳位 13 為輸出模式</div>
+                </div>
+              </div>
+              <div class="step-item" data-step="1">
+                <span class="step-num">2</span>
+                <div>
+                  <code>digitalWrite(13, HIGH);</code>
+                  <div style="font-size: 0.85rem; color: var(--on-surface-variant);">進入 loop()：送出 5V 高電位，點亮 LED</div>
+                </div>
+              </div>
+              <div class="step-item" data-step="2">
+                <span class="step-num">3</span>
+                <div>
+                  <code>delay(1000);</code>
+                  <div style="font-size: 0.85rem; color: var(--on-surface-variant);">暫停等待 1000 毫秒（1 秒鐘）</div>
+                </div>
+              </div>
+              <div class="step-item" data-step="3">
+                <span class="step-num">4</span>
+                <div>
+                  <code>digitalWrite(13, LOW);</code>
+                  <div style="font-size: 0.85rem; color: var(--on-surface-variant);">改送出 0V 低電位，熄滅 LED</div>
+                </div>
+              </div>
+              <div class="step-item" data-step="4">
+                <span class="step-num">5</span>
+                <div>
+                  <code>delay(1000); // 回到第 2 步無限重複</code>
+                  <div style="font-size: 0.85rem; color: var(--on-surface-variant);">再等 1 秒後回到 loop() 開頭繼續執行</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="block" style="display: grid; gap: var(--space-md);">
+          <h3>Arduino IDE 開發四步驟</h3>
+          <table class="bauhaus-table">
+            <thead>
+              <tr>
+                <th>步驟</th>
+                <th>操作與目的</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>1. 選板子</strong></td>
+                <td>工具 → 開發板 → 選擇 <code>Arduino Uno</code></td>
+              </tr>
+              <tr>
+                <td><strong>2. 選序列埠</strong></td>
+                <td>工具 → 序列埠 (Port) → 選取電腦偵測到的 <code>COM</code> 或 <code>usbmodem</code></td>
+              </tr>
+              <tr>
+                <td><strong>3. 驗證 (✓)</strong></td>
+                <td>檢查 C++ 語法有沒有少分號 <code>;</code> 或括號錯誤</td>
+              </tr>
+              <tr>
+                <td><strong>4. 上傳 (→)</strong></td>
+                <td>編譯並透過 USB 燒錄至晶片執行，可開啟「序列埠監控視窗」看數值</td>
+              </tr>
+            </tbody>
+          </table>
+        </aside>
+      </div>
+    </section>
+
+    <!-- SECTION 03: COMMON SENSORS & INPUT COMPONENTS -->
+    <section id="sec-sensors">
+      <div class="section-open accent-yellow">
+        <span class="kicker">PART 03 · 常見感測器與元件圖鑑</span>
+        <h2 class="section-heading">認識五大感知器官：原理、腳位定義與生活應用</h2>
+        <p class="section-desc">感測器負責把真實世界的距離、光線、溫濕度、人體熱源與按壓動作，轉換成 Arduino 能讀取的數位或類比電氣訊號。點選卡片切換元件詳解。</p>
+      </div>
+
+      <!-- Interactive Sensor Selector Tabs -->
+      <div class="tab-bar" style="margin-top: var(--space-lg);" role="tablist" aria-label="常見感測器切換">
+        <button type="button" class="btn is-active" role="tab" aria-selected="true" id="sensor-tab-hcsr04" onclick="selectSensor('hcsr04')">超音波 HC-SR04</button>
+        <button type="button" class="btn" role="tab" aria-selected="false" id="sensor-tab-ldr" onclick="selectSensor('ldr')">光敏電阻 LDR</button>
+        <button type="button" class="btn" role="tab" aria-selected="false" id="sensor-tab-dht" onclick="selectSensor('dht')">溫濕度 DHT11</button>
+        <button type="button" class="btn" role="tab" aria-selected="false" id="sensor-tab-pir" onclick="selectSensor('pir')">人體紅外線 PIR</button>
+        <button type="button" class="btn" role="tab" aria-selected="false" id="sensor-tab-button" onclick="selectSensor('button')">輕觸按鍵開關</button>
+      </div>
+
+      <div class="block grid-1-2" style="margin-top: var(--space-md); align-items: center;">
+        <div class="svg-stage" id="sensor-svg-box" style="min-height: 230px; display: flex; align-items: center; justify-content: center;">
+          <!-- Filled dynamically by JS -->
+        </div>
+
+        <div style="display: grid; gap: var(--space-md);">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-sm);">
+            <h3 id="sensor-title" style="font-size: 1.5rem;">超音波測距模組 (HC-SR04)</h3>
+            <span class="tag tag-blue" id="sensor-signal-tag">數位脈衝時間量測</span>
+          </div>
+
+          <p id="sensor-principle"></p>
+
+          <table class="bauhaus-table">
+            <thead>
+              <tr>
+                <th>腳位名稱</th>
+                <th>功能定義與接線說明</th>
+              </tr>
+            </thead>
+            <tbody id="sensor-pins-tbody"></tbody>
+          </table>
+
+          <div class="block-inset">
+            <strong>生活應用情境：</strong><span id="sensor-apps"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 04: 5 HANDS-ON INTERACTIVE EXPERIMENTS -->
+    <section id="sec-labs">
+      <div class="section-open accent-blue">
+        <span class="kicker">PART 04 · 五大動手做互動實戰實驗</span>
+        <h2 class="section-heading">從智慧紅綠燈到防盜警報器：完整接線、模擬互動與逐行解析</h2>
+        <p class="section-desc">選擇下方任一實驗卡片，即可啟動該實驗的「虛擬硬體互動模擬器」、檢視接線圖解說，並點擊每一行程式碼獲得中文逐行白話解析！</p>
+      </div>
+
+      <!-- 5 Experiment Selector Cards -->
+      <div class="lab-overview-grid" style="margin-top: var(--space-lg);" role="tablist" aria-label="選擇動手做實驗">
+        <button type="button" class="lab-card-btn is-active" id="lab-card-0" onclick="selectLab(0)">
+          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <span class="tag tag-black">實驗 01</span>
+            <span class="tag" id="lab-done-badge-0">未完成</span>
+          </div>
+          <strong style="font-size: 1.08rem;">智慧紅綠燈系統</strong>
+          <span style="font-size: 0.85rem; color: var(--on-surface-variant);">數位輸出 · 時序控制</span>
+        </button>
+
+        <button type="button" class="lab-card-btn" id="lab-card-1" onclick="selectLab(1)">
+          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <span class="tag tag-black">實驗 02</span>
+            <span class="tag" id="lab-done-badge-1">未完成</span>
+          </div>
+          <strong style="font-size: 1.08rem;">互動按鍵蜂鳴器電子琴</strong>
+          <span style="font-size: 0.85rem; color: var(--on-surface-variant);">數位輸入 · tone() 頻率</span>
+        </button>
+
+        <button type="button" class="lab-card-btn" id="lab-card-2" onclick="selectLab(2)">
+          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <span class="tag tag-black">實驗 03</span>
+            <span class="tag" id="lab-done-badge-2">未完成</span>
+          </div>
+          <strong style="font-size: 1.08rem;">光控自動調光小夜燈</strong>
+          <span style="font-size: 0.85rem; color: var(--on-surface-variant);">類比讀取 · PWM 調光</span>
+        </button>
+
+        <button type="button" class="lab-card-btn" id="lab-card-3" onclick="selectLab(3)">
+          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <span class="tag tag-black">實驗 04</span>
+            <span class="tag" id="lab-done-badge-3">未完成</span>
+          </div>
+          <strong style="font-size: 1.08rem;">超音波倒車雷達警報器</strong>
+          <span style="font-size: 0.85rem; color: var(--on-surface-variant);">測距換算 · 頻率變換</span>
+        </button>
+
+        <button type="button" class="lab-card-btn" id="lab-card-4" onclick="selectLab(4)">
+          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <span class="tag tag-black">實驗 05</span>
+            <span class="tag" id="lab-done-badge-4">未完成</span>
+          </div>
+          <strong style="font-size: 1.08rem;">智慧防盜人體警報器</strong>
+          <span style="font-size: 0.85rem; color: var(--on-surface-variant);">PIR 偵測 · 聲光聯動</span>
+        </button>
+      </div>
+
+      <!-- Active Lab Workbench -->
+      <div class="block" style="margin-top: var(--space-lg); display: grid; gap: var(--space-xl);" id="lab-workbench">
+        <!-- Header & Mark Complete -->
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: var(--space-md); border-bottom: var(--border-thick); padding-bottom: var(--space-md);">
+          <div>
+            <div style="display: flex; flex-wrap: wrap; gap: var(--space-sm); margin-bottom: var(--space-xs);">
+              <span class="tag tag-yellow" id="lab-num-tag">實驗 01</span>
+              <span class="tag tag-blue" id="lab-concept-tag">數位輸出與計時控制</span>
+            </div>
+            <h3 id="lab-title" style="font-size: clamp(1.4rem, 1.1rem + 1vw, 1.85rem);">智慧紅綠燈系統</h3>
+            <p id="lab-goal" style="margin-top: var(--space-xs); color: var(--on-surface-variant);"></p>
+          </div>
+          <button type="button" class="btn btn-primary" id="btn-toggle-complete" onclick="toggleCurrentLabComplete()">
+            <i data-lucide="check-circle" width="18" height="18"></i> 標記此實驗已完成
+          </button>
+        </div>
+
+        <!-- Row 1: Interactive Hardware Simulator (Left) + Hardware BOM & Wiring (Right) -->
+        <div class="grid-2-1">
+          <div class="block-inset" style="display: grid; gap: var(--space-md);">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: var(--space-sm);">
+              <h4 style="font-size: 1.15rem;">虛擬硬體互動模擬器 (Live Simulator)</h4>
+              <span class="tag tag-black" id="sim-status-tag">待機中</span>
+            </div>
+            <div id="lab-simulator-mount">
+              <!-- Lab 1 Simulator -->
+              <div id="sim-panel-0" style="display: grid; gap: var(--space-md);">
+                <div style="display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: var(--space-md); align-items: center;">
+                  <div style="background: var(--primary); padding: var(--space-md); border: var(--border-thick); display: grid; gap: var(--space-sm); justify-items: center;">
+                    <svg viewBox="0 0 60 150" width="60" height="150" aria-label="虛擬紅綠燈號誌">
+                      <circle id="sim-tl-red" cx="30" cy="25" r="18" fill="var(--led-off)" stroke="var(--on-primary)" stroke-width="2"/>
+                      <circle id="sim-tl-yellow" cx="30" cy="75" r="18" fill="var(--led-off)" stroke="var(--on-primary)" stroke-width="2"/>
+                      <circle id="sim-tl-green" cx="30" cy="125" r="18" fill="var(--led-green-on)" stroke="var(--on-primary)" stroke-width="2"/>
+                    </svg>
+                  </div>
+                  <div style="display: grid; gap: var(--space-md);">
+                    <div class="block-inset" style="background: var(--surface-container-low);">
+                      <div style="font-family: var(--font-label); font-size: var(--label-size); font-weight: 700;">目前燈號狀態</div>
+                      <div id="sim-tl-text" style="font-size: 1.35rem; font-weight: 900;">綠燈通行中 (Pin 11 HIGH)</div>
+                    </div>
+                    <div class="field-group">
+                      <label class="field-label" for="sim-tl-speed">
+                        <span>切換速度倍數</span>
+                        <span id="sim-tl-speed-lbl" style="font-family: var(--font-mono);">1.0x</span>
+                      </label>
+                      <input type="range" id="sim-tl-speed" min="0.5" max="2.5" step="0.5" value="1" oninput="updateTrafficSpeed(this.value)">
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: var(--space-sm);">
+                      <button type="button" class="btn btn-primary" onclick="triggerPedestrianBtn()">按下行人優先按鈕</button>
+                      <button type="button" class="btn" id="sim-tl-pause-btn" onclick="toggleTrafficPause()">暫停循環</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Lab 2 Simulator -->
+              <div id="sim-panel-1" style="display: none; gap: var(--space-md);">
+                <div style="display: flex; justify-content: space-between; align-items: center; background: var(--surface-container-low); padding: var(--space-md); border: var(--border-medium);">
+                  <div>
+                    <div style="font-family: var(--font-label); font-size: var(--label-size); font-weight: 700;">Pin 8 輸出頻率</div>
+                    <div id="sim-piano-freq" style="font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700;">0 Hz (靜音)</div>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: var(--space-sm);">
+                    <span style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700;">LED Pin 13</span>
+                    <svg viewBox="0 0 36 36" width="36" height="36" aria-hidden="true">
+                      <circle id="sim-piano-led" cx="18" cy="18" r="14" fill="var(--led-off)" stroke="var(--outline)" stroke-width="3"/>
+                    </svg>
+                  </div>
+                </div>
+                <div class="piano-row">
+                  <button type="button" class="piano-key" onclick="playPianoKey(0)">
+                    <span style="font-size: 1.4rem;">Do</span>
+                    <span style="font-family: var(--font-mono); font-size: 0.8rem;">262 Hz · 鍵 1</span>
+                  </button>
+                  <button type="button" class="piano-key" onclick="playPianoKey(1)">
+                    <span style="font-size: 1.4rem;">Re</span>
+                    <span style="font-family: var(--font-mono); font-size: 0.8rem;">294 Hz · 鍵 2</span>
+                  </button>
+                  <button type="button" class="piano-key" onclick="playPianoKey(2)">
+                    <span style="font-size: 1.4rem;">Mi</span>
+                    <span style="font-family: var(--font-mono); font-size: 0.8rem;">330 Hz · 鍵 3</span>
+                  </button>
+                  <button type="button" class="piano-key" onclick="playPianoKey(3)">
+                    <span style="font-size: 1.4rem;">Fa</span>
+                    <span style="font-family: var(--font-mono); font-size: 0.8rem;">349 Hz · 鍵 4</span>
+                  </button>
+                </div>
+                <div style="display: flex; flex-wrap: wrap; gap: var(--space-sm); align-items: center; justify-content: space-between;">
+                  <span style="font-size: 0.88rem; color: var(--on-surface-variant);">點擊琴鍵即使用 Web Audio 播放 Arduino 蜂鳴器方波音色</span>
+                  <button type="button" class="btn btn-primary" onclick="playDemoMelody()">自動示範一小段旋律</button>
+                </div>
+              </div>
+
+              <!-- Lab 3 Simulator -->
+              <div id="sim-panel-2" style="display: none; gap: var(--space-md);">
+                <div style="display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: var(--space-md); align-items: center;">
+                  <div style="background: var(--primary); border: var(--border-thick); padding: var(--space-md); text-align: center;">
+                    <svg viewBox="0 0 100 100" width="100" height="100" aria-label="自動調光夜燈發光模擬">
+                      <circle id="sim-ldr-glow" cx="50" cy="50" r="42" fill="var(--led-yellow-on)" opacity="0.6"/>
+                      <circle id="sim-ldr-bulb" cx="50" cy="50" r="24" fill="var(--led-yellow-on)" stroke="var(--on-primary)" stroke-width="3"/>
+                    </svg>
+                    <div style="color: var(--on-primary); font-family: var(--font-mono); font-size: 0.8rem; margin-top: 4px;" id="sim-ldr-pwm-lbl">PWM: 190 / 255</div>
+                  </div>
+                  <div style="display: grid; gap: var(--space-md);">
+                    <div class="field-group">
+                      <label class="field-label" for="sim-ldr-slider">
+                        <span>模擬環境光線強度（拖動滑桿）</span>
+                        <span id="sim-ldr-env-lbl" style="font-family: var(--font-mono);">黃昏微暗</span>
+                      </label>
+                      <input type="range" id="sim-ldr-slider" min="50" max="950" step="10" value="330" oninput="updateLdrSim(this.value)">
+                    </div>
+                    <div class="readout-row">
+                      <div class="readout-item">
+                        <div class="label">analogRead(A0)</div>
+                        <div class="val" id="sim-ldr-raw">330</div>
+                      </div>
+                      <div class="readout-item">
+                        <div class="label">analogWrite(~9)</div>
+                        <div class="val" id="sim-ldr-pwm">190</div>
+                      </div>
+                      <div class="readout-item">
+                        <div class="label">夜燈亮度</div>
+                        <div class="val" id="sim-ldr-pct">75%</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="block-inset" style="background: var(--surface-container-low); font-family: var(--font-mono); font-size: 0.88rem;" id="sim-ldr-serial">
+                  Serial Monitor &gt; Light: 330 | Brightness PWM: 190
+                </div>
+              </div>
+
+              <!-- Lab 4 Simulator -->
+              <div id="sim-panel-3" style="display: none; gap: var(--space-md);">
+                <div class="svg-stage" style="background: var(--surface-container-low);">
+                  <svg viewBox="0 0 420 120" aria-label="超音波倒車雷達測距模擬圖">
+                    <rect x="12" y="34" width="44" height="52" fill="var(--tertiary)" stroke="var(--outline)" stroke-width="2.5"/>
+                    <text x="34" y="64" text-anchor="middle" font-family="var(--font-mono)" font-size="9" font-weight="700" fill="var(--on-tertiary)">HC-SR04</text>
+                    <path d="M68,42 A26,26 0 0,1 68,78 M82,32 A40,40 0 0,1 82,88" fill="none" stroke="var(--tertiary)" stroke-width="2.5" stroke-dasharray="4 3"/>
+                    <line id="sim-radar-beam" x1="56" y1="60" x2="210" y2="60" stroke="var(--outline)" stroke-width="2" stroke-dasharray="5 3"/>
+                    <g id="sim-radar-wall" transform="translate(210, 20)">
+                      <rect x="0" y="0" width="24" height="80" fill="var(--primary-container)" stroke="var(--outline)" stroke-width="2.5"/>
+                      <text x="12" y="44" text-anchor="middle" font-family="var(--font-label)" font-size="9" font-weight="700" fill="var(--on-surface)">牆</text>
+                    </g>
+                    <circle id="sim-radar-g" cx="350" cy="28" r="10" fill="var(--led-off)" stroke="var(--outline)" stroke-width="2"/>
+                    <circle id="sim-radar-y" cx="350" cy="60" r="10" fill="var(--led-yellow-on)" stroke="var(--outline)" stroke-width="2"/>
+                    <circle id="sim-radar-r" cx="350" cy="92" r="10" fill="var(--led-off)" stroke="var(--outline)" stroke-width="2"/>
+                    <text x="368" y="32" font-family="var(--font-mono)" font-size="10" font-weight="700">安全</text>
+                    <text x="368" y="64" font-family="var(--font-mono)" font-size="10" font-weight="700">警戒</text>
+                    <text x="368" y="96" font-family="var(--font-mono)" font-size="10" font-weight="700">危險</text>
+                  </svg>
+                </div>
+                <div class="field-group">
+                  <label class="field-label" for="sim-radar-dist">
+                    <span>拖動障礙物距離</span>
+                    <span id="sim-radar-cm-lbl" style="font-family: var(--font-mono);">35 cm</span>
+                  </label>
+                  <input type="range" id="sim-radar-dist" min="5" max="100" step="1" value="35" oninput="updateRadarSim(this.value)">
+                </div>
+                <div class="readout-row">
+                  <div class="readout-item">
+                    <div class="label">回波時間 pulseIn</div>
+                    <div class="val" id="sim-radar-us">2059 µs</div>
+                  </div>
+                  <div class="readout-item">
+                    <div class="label">計算距離</div>
+                    <div class="val" id="sim-radar-cm">35.0 cm</div>
+                  </div>
+                  <div class="readout-item">
+                    <div class="label">警報音開關</div>
+                    <div>
+                      <button type="button" class="btn" id="sim-radar-sound-btn" onclick="toggleRadarSound()">開啟警報嗶聲</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Lab 5 Simulator -->
+              <div id="sim-panel-4" style="display: none; gap: var(--space-md);">
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-md);">
+                  <div class="block-inset" style="background: var(--surface-container-low); display: grid; gap: var(--space-sm);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <strong>系統布防狀態</strong>
+                      <span class="tag tag-yellow" id="sim-pir-arm-tag">已布防 (Armed)</span>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="togglePirArm()">按下 Pin 4 布防切換按鈕</button>
+                  </div>
+                  <div class="block-inset" style="background: var(--surface-container-low); display: grid; gap: var(--space-sm);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <strong>紅藍警報燈 (Pin 11/12)</strong>
+                      <div style="display: flex; gap: var(--space-sm);">
+                        <svg viewBox="0 0 60 28" width="60" height="28" aria-hidden="true">
+                          <circle id="sim-pir-led-r" cx="14" cy="14" r="11" fill="var(--led-off)" stroke="var(--outline)" stroke-width="2.5"/>
+                          <circle id="sim-pir-led-b" cx="44" cy="14" r="11" fill="var(--led-off)" stroke="var(--outline)" stroke-width="2.5"/>
+                        </svg>
+                      </div>
+                    </div>
+                    <button type="button" class="btn btn-blue" id="sim-pir-move-btn" onclick="togglePirIntruder()">模擬有人員走入感應區</button>
+                  </div>
+                </div>
+                <div class="block-inset" style="background: var(--code-bg); color: var(--code-fg); font-family: var(--font-mono); font-size: 0.86rem;" id="sim-pir-log">
+                  [Serial] 系統已進入警戒布防模式，等待 PIR 偵測移動熱源...
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: grid; gap: var(--space-md);">
+            <div class="block-inset">
+              <h4 style="font-size: 1.1rem; margin-bottom: var(--space-sm);">硬體元件清單</h4>
+              <ul id="lab-bom-list" style="margin: 0; padding-left: 1.25rem; display: grid; gap: var(--space-xs);"></ul>
+            </div>
+
+            <div class="block-inset">
+              <h4 style="font-size: 1.1rem; margin-bottom: var(--space-sm);">電路接線圖解說</h4>
+              <div class="svg-stage" style="padding: var(--space-sm); margin-bottom: var(--space-sm);" id="lab-wiring-svg"></div>
+              <table class="bauhaus-table" style="font-size: 0.88rem;">
+                <thead>
+                  <tr>
+                    <th>元件腳位</th>
+                    <th>連接至 Arduino / 麵包板</th>
+                  </tr>
+                </thead>
+                <tbody id="lab-wiring-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 2: Full Code + Interactive Line-by-Line Explainer -->
+        <div style="display: grid; gap: var(--space-md);">
+          <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-sm);">
+            <div>
+              <h4 style="font-size: 1.2rem;">完整 Arduino C++ 程式碼與逐行互動解析</h4>
+              <p style="font-size: 0.92rem; color: var(--on-surface-variant);">點擊左側任一行程式碼，右側立即顯示該行語法的詳細白話解說！</p>
+            </div>
+            <button type="button" class="btn" id="btn-copy-code" onclick="copyLabCode()">
+              <i data-lucide="copy" width="16" height="16"></i> 複製程式碼
+            </button>
+          </div>
+
+          <div class="code-workbench">
+            <div class="code-panel" id="lab-code-lines" role="listbox" aria-label="程式碼逐行解析列表"></div>
+            <div class="block block-yellow code-explain-box">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-sm);">
+                  <span class="tag tag-black" id="code-line-badge">第 1 行解析</span>
+                  <div style="display: flex; gap: var(--space-xs);">
+                    <button type="button" class="btn" style="min-height: 36px; padding: 0.25rem 0.6rem;" onclick="stepCodeLine(-1)" aria-label="上一行">↑</button>
+                    <button type="button" class="btn" style="min-height: 36px; padding: 0.25rem 0.6rem;" onclick="stepCodeLine(1)" aria-label="下一行">↓</button>
+                  </div>
+                </div>
+                <pre id="code-line-preview" style="font-family: var(--font-mono); background: var(--code-bg); color: var(--code-fg); padding: var(--space-sm); border: var(--border-medium); overflow-x: auto; margin: 0 0 var(--space-md) 0; font-size: 0.85rem;"></pre>
+                <p id="code-line-explanation" style="font-weight: 500;"></p>
+              </div>
+              <div style="border-top: var(--border-medium); padding-top: var(--space-sm); font-size: 0.85rem;">
+                <strong>語法重點：</strong><span id="code-line-concept"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 3: Extension Challenge -->
+        <details class="challenge-box" id="lab-challenge-details">
+          <summary>
+            <span>延伸思考挑戰：<span id="lab-challenge-q"></span></span>
+            <span class="tag tag-blue">展開提示</span>
+          </summary>
+          <p id="lab-challenge-hint" style="margin: 0;"></p>
+        </details>
+      </div>
+    </section>
+
+    <!-- SECTION 05: INTERACTIVE QUIZ -->
+    <section id="sec-quiz">
+      <div class="section-open accent-black">
+        <span class="kicker">PART 05 · 創客隨堂檢定</span>
+        <h2 class="section-heading">挑戰 5 道核心觀念題，測試你的 Arduino 實作力</h2>
+        <p class="section-desc">回答以下題目，系統將立即顯示詳解並自動儲存你的學習成績。</p>
+      </div>
+
+      <div class="quiz-grid" style="margin-top: var(--space-lg);" id="quiz-container">
+        <!-- Populated by JS -->
+      </div>
+    </section>
+
+    <!-- FOOTER & SOURCES -->
+    <footer class="site-footer">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-md); align-items: center;">
+        <strong>Arduino 創客實驗室 · 中學生自主互動教學平台</strong>
+        <span class="tag tag-yellow">2026 創客教育專題</span>
+      </div>
+      <p>參考教材與資料來源：Arduino 入門互動式課程指引、Jody Culkin &amp; Eric Hagan《Learn Electronics with Arduino》、孫可與張振國《零基礎 Arduino 智能控制入門》、趙英杰《完美圖解 Arduino 互動設計入門》。</p>
+    </footer>
+
+  </div>
+
+  <api-shim></api-shim>
+  <script>
+    /* ================================================================
+       STATE & PERSISTENCE (notebookAppApi)
+       ================================================================ */
+    const APP_STATE = {
+      completedLabs: [],
+      activeLabIndex: 0,
+      activeSensorId: 'hcsr04',
+      quizAnswers: {}
+    };
+
+    let lifeInterval = null;
+    let lifeStep = 0;
+    let lifeLoopCount = 0;
+
+    let trafficInterval = null;
+    let trafficPhase = 0; // 0:green, 1:green-blink, 2:yellow, 3:red
+    let trafficGreenSec = 4;
+    let trafficPedestrianReq = false;
+
+    let radarBeepTimer = null;
+    let alarmTimer = null;
+    let audioCtx = null;
+
+    let currentCodeLine = 0;
+
+    function ensureAudioCtx() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          audioCtx = new AudioContextClass();
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function playToneBurst(freq, durationMs, type) {
+      const ctx = ensureAudioCtx();
+      if (!ctx) return;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type || 'square';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + durationMs / 1000);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + durationMs / 1000);
+    }
+
+    async function saveAppState() {
+      if (window.notebookAppApi && typeof window.notebookAppApi.setAppState === 'function') {
+        try {
+          await window.notebookAppApi.setAppState({
+            completedLabs: APP_STATE.completedLabs,
+            activeLabIndex: APP_STATE.activeLabIndex,
+            activeSensorId: APP_STATE.activeSensorId,
+            quizAnswers: APP_STATE.quizAnswers
+          });
+        } catch (err) {
+          // Ignore persistence errors in standalone preview
+        }
+      }
+    }
+
+    function handleResetProgress(btn) {
+      if (!btn) return;
+      if (btn.dataset.armed !== 'true') {
+        btn.dataset.armed = 'true';
+        btn.textContent = '再點一次確認清除';
+        btn.classList.add('btn-primary');
+        return;
+      }
+      btn.dataset.armed = 'false';
+      btn.textContent = '重設紀錄';
+      btn.classList.remove('btn-primary');
+      APP_STATE.completedLabs = [];
+      APP_STATE.quizAnswers = {};
+      updateProgressUI();
+      renderQuiz();
+      selectLab(APP_STATE.activeLabIndex);
+      saveAppState();
+    }
+
+    function updateProgressUI() {
+      const count = APP_STATE.completedLabs.length;
+      const ratioEl = document.getElementById('progress-ratio');
+      const fillEl = document.getElementById('progress-fill');
+      const barWrap = document.getElementById('progress-bar-wrap');
+      const statusEl = document.getElementById('progress-status');
+      const quizBadge = document.getElementById('quiz-score-badge');
+
+      if (ratioEl) ratioEl.textContent = count + ' / 5';
+      if (fillEl) fillEl.style.width = (count / 5 * 100) + '%';
+      if (barWrap) barWrap.setAttribute('aria-valuenow', String(count));
+
+      if (statusEl) {
+        if (count === 0) {
+          statusEl.textContent = '尚未勾選完成實驗。進入下方實驗工作台並完成實作即可紀錄進度。';
+        } else if (count < 5) {
+          statusEl.textContent = `太棒了！已完成 ${count} 個實驗，繼續挑戰下一個感測器實作吧！`;
+        } else {
+          statusEl.textContent = '恭喜全部完成！你已經掌握基礎電學與五大 Arduino 感測專案。';
+        }
+      }
+
+      for (let i = 0; i < 5; i++) {
+        const badge = document.getElementById('lab-done-badge-' + i);
+        if (badge) {
+          const done = APP_STATE.completedLabs.includes(i);
+          badge.textContent = done ? '已完成' : '未完成';
+          badge.className = done ? 'tag tag-green' : 'tag';
+        }
+      }
+
+      if (quizBadge) {
+        let correctCount = 0;
+        QUIZ_DATA.forEach(function (q, idx) {
+          if (APP_STATE.quizAnswers[idx] === q.answer) correctCount++;
+        });
+        quizBadge.textContent = `隨堂測驗：${correctCount} / ${QUIZ_DATA.length} 題`;
+      }
+    }
+
+    /* ================================================================
+       PART 01A: OHM'S LAW & SAFETY SIMULATOR
+       ================================================================ */
+    let currentOhmMode = 'normal';
+
+    function setOhmMode(mode) {
+      currentOhmMode = mode;
+      ['normal', 'open', 'short'].forEach(function (m) {
+        const btn = document.getElementById('ohm-mode-' + m);
+        if (btn) btn.classList.toggle('is-active', m === mode);
+      });
+      updateOhmSim();
+    }
+
+    function updateOhmSim() {
+      const vSelect = document.getElementById('ohm-voltage');
+      const rSlider = document.getElementById('ohm-resistor');
+      if (!vSelect || !rSlider) return;
+
+      const vSource = parseFloat(vSelect.value);
+      const rVal = parseInt(rSlider.value, 10);
+      const vLed = 2.0; // Typical red LED forward voltage
+
+      const vDisp = document.getElementById('ohm-v-display');
+      const rDisp = document.getElementById('ohm-r-display');
+      const curVal = document.getElementById('ohm-current-val');
+      const dropVal = document.getElementById('ohm-drop-val');
+      const stateVal = document.getElementById('ohm-state-val');
+      const banner = document.getElementById('ohm-banner');
+      const bannerTxt = document.getElementById('ohm-banner-text');
+
+      const svgV = document.getElementById('svg-ohm-v');
+      const svgR = document.getElementById('svg-ohm-r');
+      const svgResGrp = document.getElementById('svg-resistor-grp');
+      const svgOpenGrp = document.getElementById('svg-open-grp');
+      const svgWireGap = document.getElementById('svg-wire-gap');
+      const svgLed = document.getElementById('svg-ohm-led');
+      const svgHalo = document.getElementById('svg-ohm-halo');
+      const svgLedLbl = document.getElementById('svg-ohm-led-lbl');
+
+      if (vDisp) vDisp.textContent = vSource.toFixed(1) + ' V';
+      if (svgV) svgV.textContent = vSource.toFixed(1) + 'V';
+
+      if (currentOhmMode === 'open') {
+        rSlider.disabled = true;
+        if (rDisp) rDisp.textContent = '∞ (斷開)';
+        if (curVal) curVal.textContent = '0.0 mA';
+        if (dropVal) dropVal.textContent = '0.0 V';
+        if (stateVal) stateVal.textContent = '完全不亮';
+        if (svgResGrp) svgResGrp.style.display = 'none';
+        if (svgOpenGrp) svgOpenGrp.style.display = 'block';
+        if (svgWireGap) svgWireGap.style.display = 'none';
+        if (svgLed) svgLed.setAttribute('fill', 'var(--led-off)');
+        if (svgHalo) svgHalo.setAttribute('opacity', '0');
+        if (svgLedLbl) svgLedLbl.textContent = '無電流通過';
+        if (banner) banner.className = 'status-banner status-warn';
+        if (bannerTxt) bannerTxt.textContent = '開路狀態（Open Circuit）：迴路有斷點，電流無法流通（0 mA）。請檢查麵包板孔位是否插在同一排，或 LED 長腳（正極）與短腳（負極）是否接反。';
+        return;
+      }
+
+      if (currentOhmMode === 'short') {
+        rSlider.disabled = true;
+        if (rDisp) rDisp.textContent = '0 Ω (無電阻)';
+        if (curVal) curVal.textContent = '> 500 mA';
+        if (dropVal) dropVal.textContent = '0.0 V';
+        if (stateVal) stateVal.textContent = '過載燒毀！';
+        if (svgResGrp) svgResGrp.style.display = 'none';
+        if (svgOpenGrp) svgOpenGrp.style.display = 'none';
+        if (svgWireGap) svgWireGap.style.display = 'block';
+        if (svgLed) svgLed.setAttribute('fill', 'var(--primary)');
+        if (svgHalo) svgHalo.setAttribute('opacity', '0');
+        if (svgLedLbl) svgLedLbl.textContent = '過熱燒毀！';
+        if (banner) banner.className = 'status-banner status-danger';
+        if (bannerTxt) bannerTxt.textContent = '危險警告：LED 沒有串聯限流電阻！5V 直接灌入將導致電流瞬間暴衝，幾秒內就會燒毀 LED 與 Arduino 輸出腳位！';
+        return;
+      }
+
+      // Normal mode
+      rSlider.disabled = false;
+      if (svgResGrp) svgResGrp.style.display = 'block';
+      if (svgOpenGrp) svgOpenGrp.style.display = 'none';
+      if (svgWireGap) svgWireGap.style.display = 'block';
+      if (rDisp) rDisp.textContent = rVal + ' Ω';
+      if (svgR) svgR.textContent = rVal + 'Ω';
+
+      const vDrop = Math.max(0, vSource - vLed);
+      const currentMa = (vDrop / rVal) * 1000;
+
+      if (curVal) curVal.textContent = currentMa.toFixed(1) + ' mA';
+      if (dropVal) dropVal.textContent = vDrop.toFixed(1) + ' V';
+
+      const brightness = Math.min(1, Math.max(0.12, currentMa / 20));
+      if (svgLed) svgLed.setAttribute('fill', 'var(--led-red-on)');
+      if (svgHalo) svgHalo.setAttribute('opacity', String((brightness * 0.45).toFixed(2)));
+
+      if (currentMa > 25) {
+        if (stateVal) stateVal.textContent = '電流過大！';
+        if (svgLedLbl) svgLedLbl.textContent = '過亮有風險';
+        if (banner) banner.className = 'status-banner status-danger';
+        if (bannerTxt) bannerTxt.textContent = `過電流警告：目前電流 ${currentMa.toFixed(1)} mA 超過 LED 建議上限（20 mA）！請調高電阻值（例如 330Ω 或 470Ω）。`;
+      } else if (currentMa < 5) {
+        if (stateVal) stateVal.textContent = '微亮';
+        if (svgLedLbl) svgLedLbl.textContent = '微弱發光';
+        if (banner) banner.className = 'status-banner status-warn';
+        if (bannerTxt) bannerTxt.textContent = `電流偏小（${currentMa.toFixed(1)} mA）：電阻阻值較高，LED 仍可安全點亮但亮度偏暗。`;
+      } else {
+        if (stateVal) stateVal.textContent = '安全明亮';
+        if (svgLedLbl) svgLedLbl.textContent = 'LED 正常發光';
+        if (banner) banner.className = 'status-banner status-safe';
+        if (bannerTxt) bannerTxt.textContent = `安全運作中：I = (${vSource.toFixed(1)}V - 2.0V) / ${rVal}Ω = ${currentMa.toFixed(1)} mA，完美保護 LED 與 Arduino 腳位。`;
+      }
+    }
+
+    /* ================================================================
+       PART 01B: BREADBOARD SIMULATOR
+       ================================================================ */
+    const BREADBOARD_ZONES = {
+      power: {
+        tag: `水平整排導通`,
+        title: `上下兩側電源軌（+ 正極 / - 負極）`,
+        desc: `標示紅線（+）與藍線（-）的兩排孔洞，底部的金屬銅片是「水平一整排連通」的。通常從 Arduino 的 5V 接一條線到紅色軌，GND 接到藍色軌，整條軌道就能同時分接給多個零件使用！`,
+        tip: `提示：極少數大型麵包板電源軌會在正中間斷開，請留意紅藍印刷線是否連續。`
+      },
+      row: {
+        tag: `垂直 5 孔導通`,
+        title: `中央插接區（a–e 與 f–j 群組）`,
+        desc: `中央的每一「直行」包含 5 個孔洞（例如 10a, 10b, 10c, 10d, 10e），這 5 個孔底下被同一片銅片夾住而彼此導通；但第 10 行與隔壁第 11 行是完全絕緣不連通的！`,
+        tip: `提示：要讓電阻腳位連到 LED 腳位，只要把它們插在「同一直行的 5 孔內」即可。`
+      },
+      gutter: {
+        tag: `上下絕緣隔離`,
+        title: `跨接中央溝槽（IC 晶片與元件區）`,
+        desc: `中間這條凹槽把上排（a–e）與下排（f–j）完全隔開。雙排腳位的晶片（如 ATmega328P）或四腳按鍵跨插在溝槽兩側時，上下兩排腳位才不會彼此短路！`,
+        tip: `提示：將 LED 或電阻跨接溝槽兩側，也是非常乾淨好辨識的接法。`
+      },
+      mistake: {
+        tag: `危險短路示範`,
+        title: `新手最常犯錯：元件兩腳插在同一排`,
+        desc: `看右側紅框！如果把 LED 的正極長腳與負極短腳插在「同一直行的 5 孔內」（例如同時插在 20a 與 20d），電流會直接從底下銅片抄近路流過，完全不經過 LED，造成燈不亮或短路！`,
+        tip: `解決方式：元件兩支腳一定要插在「不同直行」或是「跨越中央溝槽」。`
+      }
+    };
+
+    function buildBreadboardHoles() {
+      const container = document.getElementById('bb-holes-container');
+      if (!container) return;
+      let html = '';
+      // 25 columns from x=52 to x=580 step 22
+      for (let c = 0; c < 25; c++) {
+        const cx = 52 + c * 22;
+        // Power rails top (+ and -)
+        if (c !== 12) {
+          html += `<rect x="${cx - 3}" y="32" width="6" height="6" fill="var(--breadboard-hole)"/>`;
+          html += `<rect x="${cx - 3}" y="46" width="6" height="6" fill="var(--breadboard-hole)"/>`;
+          html += `<rect x="${cx - 3}" y="197" width="6" height="6" fill="var(--breadboard-hole)"/>`;
+          html += `<rect x="${cx - 3}" y="211" width="6" height="6" fill="var(--breadboard-hole)"/>`;
+        }
+        // Top 5 rows a-e
+        for (let r = 0; r < 5; r++) {
+          const cy = 68 + r * 9;
+          html += `<rect x="${cx - 3}" y="${cy}" width="6" height="6" fill="var(--breadboard-hole)"/>`;
+        }
+        // Bottom 5 rows f-j
+        for (let r = 0; r < 5; r++) {
+          const cy = 139 + r * 9;
+          html += `<rect x="${cx - 3}" y="${cy}" width="6" height="6" fill="var(--breadboard-hole)"/>`;
+        }
+      }
+      container.innerHTML = html;
+    }
+
+    function selectBreadboardZone(zone) {
+      const info = BREADBOARD_ZONES[zone];
+      if (!info) return;
+      ['power', 'row', 'gutter', 'mistake'].forEach(function (z) {
+        const btn = document.getElementById('bb-btn-' + z);
+        if (btn) btn.classList.toggle('is-active', z === zone);
+        const hl = document.getElementById('bb-hl-' + z);
+        if (hl) hl.setAttribute('opacity', z === zone ? '1' : '0');
+      });
+
+      const tagEl = document.getElementById('bb-info-tag');
+      const titleEl = document.getElementById('bb-info-title');
+      const descEl = document.getElementById('bb-info-desc');
+      const tipEl = document.getElementById('bb-info-tip');
+
+      if (tagEl) tagEl.textContent = info.tag;
+      if (titleEl) titleEl.textContent = info.title;
+      if (descEl) descEl.textContent = info.desc;
+      if (tipEl) tipEl.textContent = info.tip;
+    }
+
+    /* ================================================================
+       PART 02: ARDUINO UNO EXPLORER & LIFECYCLE
+       ================================================================ */
+    const UNO_PARTS = {
+      usb: {
+        title: `USB Type-B 連接埠`,
+        badge: `供電與燒錄`,
+        desc: `透過 USB 傳輸線連接電腦與 Arduino Uno，同時完成兩件事：提供開發板 5V 穩定工作電源，以及將你在 Arduino IDE 寫好的程式碼編譯上傳（燒錄）進晶片裡，並支援序列埠監控除錯。`,
+        spec: `規格：5V DC 輸入｜透過 USB 轉 UART 晶片與電腦通訊`
+      },
+      mcu: {
+        title: `ATmega328P 微控制器`,
+        badge: `運算大腦`,
+        desc: `板子上最大顆的黑色長條形晶片，就像整台系統的 CPU 與記憶體。你的程式上傳後就儲存在它內部的 32KB 快閃記憶體裡，斷電也不會消失，下次通電立刻執行！`,
+        spec: `規格：8-bit AVR 架構｜時脈 16 MHz｜Flash 32KB｜SRAM 2KB`
+      },
+      digital: {
+        title: `數位輸入／輸出腳位 (0–13)`,
+        badge: `Digital I/O & PWM`,
+        desc: `腳位 0–13 可設定為 INPUT（讀取按鍵、紅外線訊號）或 OUTPUT（點亮 LED、控制蜂鳴器）。其中標記波浪符號「~」的腳位（3, 5, 6, 9, 10, 11）支援 PWM 類比模擬輸出，能做出呼吸燈調光！`,
+        spec: `規格：HIGH = 5V，LOW = 0V｜PWM 解析度 0–255｜Pin 13 內建 LED`
+      },
+      analog: {
+        title: `類比輸入腳位 (A0–A5)`,
+        badge: `Analog Input`,
+        desc: `專門讀取「連續變化」的感測器電壓（例如光敏電阻、旋鈕電位器、溫度類比感測器）。內建 10 位元類比數位轉換器 (ADC)，會將 0V–5V 電壓精準轉換成 0–1023 的整數數值。`,
+        spec: `規格：10-bit ADC（數值範圍 0–1023）｜可當額外數位腳位 14–19 使用`
+      },
+      power: {
+        title: `電源與接地腳位 (Power Pins)`,
+        badge: `供電基準`,
+        desc: `提供麵包板與感測器所需的穩定電源。5V 與 3.3V 可輸出電力給外部模組；GND（Ground）是所有電路共同的 0V 負極參考基準；VIN 則可從外部電池輸入電壓給開發板。`,
+        spec: `規格：5V（大多數模組）｜3.3V（特定感測器）｜GND 務必共地連接`
+      },
+      jack: {
+        title: `外部直流電源插座 (DC Jack)`,
+        badge: `獨立運作`,
+        desc: `當作品完成且不再連接電腦 USB 時，可以插上 9V 電池或變壓器讓 Arduino 獨立運作。板載穩壓晶片會自動把 7V–12V 降壓轉成穩定的 5V 供內部電路使用。`,
+        spec: `規格：建議輸入 7V–12V DC（中心正極）｜極限範圍 6V–20V`
+      }
+    };
+
+    function selectUnoPart(partKey) {
+      const info = UNO_PARTS[partKey];
+      if (!info) return;
+
+      ['usb', 'mcu', 'digital', 'analog', 'power', 'jack'].forEach(function (k) {
+        const btn = document.getElementById('uno-btn-' + k);
+        if (btn) btn.classList.toggle('is-active', k === partKey);
+        const box = document.getElementById('uno-box-' + k);
+        if (box) {
+          box.setAttribute('stroke', k === partKey ? 'var(--primary-container)' : 'var(--outline)');
+          box.setAttribute('stroke-width', k === partKey ? '4.5' : '2.5');
+        }
+      });
+
+      const t = document.getElementById('uno-part-title');
+      const b = document.getElementById('uno-part-badge');
+      const d = document.getElementById('uno-part-desc');
+      const s = document.getElementById('uno-part-spec');
+      if (t) t.textContent = info.title;
+      if (b) b.textContent = info.badge;
+      if (d) d.textContent = info.desc;
+      if (s) s.textContent = info.spec;
+    }
+
+    function renderLifecycleState() {
+      const items = document.querySelectorAll('#lifecycle-steps .step-item');
+      items.forEach(function (el, idx) {
+        el.classList.toggle('is-running', idx === lifeStep);
+      });
+
+      const led = document.getElementById('life-led-circle');
+      const ledTxt = document.getElementById('life-led-text');
+      const countEl = document.getElementById('life-cycle-count');
+
+      const isOn = (lifeStep === 1 || lifeStep === 2);
+      if (led) led.setAttribute('fill', isOn ? 'var(--led-yellow-on)' : 'var(--led-off)');
+      if (ledTxt) ledTxt.textContent = isOn ? 'HIGH' : 'LOW';
+      if (countEl) countEl.textContent = `loop() 執行次數：${lifeLoopCount}`;
+    }
+
+    function stepLifecycle() {
+      if (lifeStep === 4) {
+        lifeStep = 1;
+        lifeLoopCount++;
+      } else {
+        if (lifeStep === 0) lifeLoopCount = 1;
+        lifeStep++;
+      }
+      renderLifecycleState();
+    }
+
+    function toggleAutoLifecycle() {
+      const btn = document.getElementById('btn-auto-life');
+      if (lifeInterval) {
+        clearInterval(lifeInterval);
+        lifeInterval = null;
+        if (btn) {
+          btn.textContent = '自動循環播放';
+          btn.classList.remove('is-active');
+        }
+      } else {
+        if (btn) {
+          btn.textContent = '暫停播放';
+          btn.classList.add('is-active');
+        }
+        lifeInterval = setInterval(stepLifecycle, 900);
+      }
+    }
+
+    /* ================================================================
+       PART 03: COMMON SENSORS ENCYCLOPEDIA
+       ================================================================ */
+    const SENSORS_DATA = {
+      hcsr04: {
+        title: `超音波測距模組 (HC-SR04)`,
+        signal: `數位脈衝時間量測`,
+        principle: `外觀像一對大眼睛：一顆負責發射人耳聽不見的 40kHz 超音波脈衝，碰到障礙物反彈後由另一顆接收。Arduino 測量聲音來回時間 t（微秒），再利用空氣音速（約 0.034 cm/µs）除以 2 算出單程距離！`,
+        apps: `汽車倒車雷達、自動感應開蓋垃圾桶、自走車避障機器人、水塔液位高度偵測。`,
+        pins: [
+          [`VCC`, `接 Arduino 5V 電源正極`],
+          [`Trig`, `觸發輸入腳位：給 10µs 高電位脈衝啟動發射超音波`],
+          [`Echo`, `回波輸出腳位：收到反彈波前保持高電位，可用 pulseIn() 量測時間`],
+          [`GND`, `接 Arduino GND 接地端`]
+        ],
+        svg: `<svg viewBox="0 0 280 155" width="260" aria-label="HC-SR04 超音波感測器外觀與腳位圖">
+          <rect x="20" y="20" width="240" height="90" rx="4" fill="var(--tertiary)" stroke="var(--outline)" stroke-width="3"/>
+          <circle cx="80" cy="65" r="32" fill="var(--pcb-silver)" stroke="var(--outline)" stroke-width="3"/>
+          <circle cx="80" cy="65" r="20" fill="var(--primary)" stroke="var(--outline)" stroke-width="2"/>
+          <circle cx="200" cy="65" r="32" fill="var(--pcb-silver)" stroke="var(--outline)" stroke-width="3"/>
+          <circle cx="200" cy="65" r="20" fill="var(--primary)" stroke="var(--outline)" stroke-width="2"/>
+          <rect x="128" y="34" width="24" height="14" fill="var(--pcb-silver)" stroke="var(--outline)" stroke-width="2"/>
+          <text x="80" y="106" text-anchor="middle" font-family="var(--font-mono)" font-size="10" font-weight="700" fill="var(--on-tertiary)">T (發射)</text>
+          <text x="200" y="106" text-anchor="middle" font-family="var(--font-mono)" font-size="10" font-weight="700" fill="var(--on-tertiary)">R (接收)</text>
+          <g transform="translate(104, 110)">
+            <rect x="0" y="0" width="12" height="26" fill="var(--pcb-gold)" stroke="var(--outline)" stroke-width="2"/>
+            <rect x="20" y="0" width="12" height="26" fill="var(--pcb-gold)" stroke="var(--outline)" stroke-width="2"/>
+            <rect x="40" y="0" width="12" height="26" fill="var(--pcb-gold)" stroke="var(--outline)" stroke-width="2"/>
+            <rect x="60" y="0" width="12" height="26" fill="var(--pcb-gold)" stroke="var(--outline)" stroke-width="2"/>
+            <text x="6" y="40" text-anchor="middle" font-family="var(--font-mono)" font-size="10" font-weight="700" fill="var(--on-surface)">VCC</text>
+            <text x="26" y="40" text-anchor="middle" font-family="var(--font-mono)" font-size="10" font-weight="700" fill="var(--on-surface)">Trig</text>
+            <text x="46" y="40" text-anchor="middle" font-family="var(--font-mono)" font-size="10" font-weight="700" fill="var(--on-surface)">Echo</text>
+            <text x="66" y="40" text-anchor="middle" font-family="var(--font-mono)" font-size="10" font-weight="700" fill="var(--on-surface)">GND</text>
+          </g>
+        </svg>`
+      },
+      ldr: {
+        title: `光敏電阻 (LDR, Photoresistor)`,
+        signal: `類比電壓輸入 (A0–A5)`,
+        principle: `光敏電阻是一種電阻值會隨著「照度（光線強弱）」改變的半導體元件：光線越亮，電阻值大幅下降（可低至數百歐姆）；越黑暗，電阻值飆升（可達數十萬歐姆）。搭配一顆固定電阻串聯分壓，Arduino 就能從類比腳位讀取 0–1023 的明暗數值。`,
+        apps: `自動感應夜間路燈、智慧型手機螢幕自動亮度調節、追光太陽能追蹤器、自動窗簾控制。`,
+        pins: [
+          [`腳位 1`, `無正負極區分！一端接 5V，另一端與 10kΩ 電阻相接形成分壓`],
+          [`腳位 2`, `接至 Arduino 類比輸入腳位（如 A0），並透過 10kΩ 電阻連至 GND`]
+        ],
+        svg: `<svg viewBox="0 0 260 155" width="240" aria-label="光敏電阻 LDR 構造與分壓示意圖">
+          <circle cx="130" cy="58" r="36" fill="var(--surface-container-low)" stroke="var(--outline)" stroke-width="3"/>
+          <path d="M105,46 L155,46 L105,58 L155,58 L105,70 L155,70" fill="none" stroke="var(--secondary)" stroke-width="4" stroke-linejoin="round"/>
+          <line x1="115" y1="92" x2="115" y2="138" stroke="var(--pcb-silver)" stroke-width="5"/>
+          <line x1="145" y1="92" x2="145" y2="138" stroke="var(--pcb-silver)" stroke-width="5"/>
+          <!-- Light rays -->
+          <path d="M55,22 L85,42 M45,42 L75,62" stroke="var(--primary-container)" stroke-width="4" stroke-linecap="round"/>
+          <text x="130" y="150" text-anchor="middle" font-family="var(--font-mono)" font-size="11" font-weight="700" fill="var(--on-surface)">無分正負極 · 亮時阻值低 / 暗時阻值高</text>
+        </svg>`
+      },
+      dht: {
+        title: `數位溫濕度感測器 (DHT11 / DHT22)`,
+        signal: `單匯流排數位通訊`,
+        principle: `內部同時封裝了測量空氣濕度的電容式感濕元件與測量溫度的 NTC 熱敏電阻，並由內建 8-bit 晶片轉換為校準過的數位資料封包。寫程式時需匯入 DHT 函式庫，直接呼叫 dht.readTemperature() 與 dht.readHumidity()。`,
+        apps: `智慧溫室植栽自動澆水、居家環境除濕機自動啟停、教室舒適度監測站。`,
+        pins: [
+          [`VCC (+)`, `接 3.3V 或 5V 電源正極`],
+          [`DATA (OUT)`, `數位訊號腳位，接至 Arduino 任意數位腳位（如 Pin 2）`],
+          [`GND (-)`, `接 Arduino GND 接地端（部分裸片 4 腳版第 3 腳為 NC 空腳）`]
+        ],
+        svg: `<svg viewBox="0 0 260 155" width="240" aria-label="DHT11 溫濕度感測器模組圖">
+          <rect x="85" y="15" width="90" height="90" fill="var(--tertiary)" stroke="var(--outline)" stroke-width="3"/>
+          <rect x="96" y="25" width="68" height="68" fill="var(--surface-container-low)" stroke="var(--outline)" stroke-width="2"/>
+          <line x1="112" y1="25" x2="112" y2="93" stroke="var(--tertiary)" stroke-width="2"/>
+          <line x1="130" y1="25" x2="130" y2="93" stroke="var(--tertiary)" stroke-width="2"/>
+          <line x1="148" y1="25" x2="148" y2="93" stroke="var(--tertiary)" stroke-width="2"/>
+          <line x1="96" y1="45" x2="164" y2="45" stroke="var(--tertiary)" stroke-width="2"/>
+          <line x1="96" y1="69" x2="164" y2="69" stroke="var(--tertiary)" stroke-width="2"/>
+          <line x1="104" y1="105" x2="104" y2="132" stroke="var(--pcb-gold)" stroke-width="5"/>
+          <line x1="130" y1="105" x2="130" y2="132" stroke="var(--pcb-gold)" stroke-width="5"/>
+          <line x1="156" y1="105" x2="156" y2="132" stroke="var(--pcb-gold)" stroke-width="5"/>
+          <text x="104" y="148" text-anchor="middle" font-family="var(--font-mono)" font-size="11" font-weight="700" fill="var(--on-surface)">VCC</text>
+          <text x="130" y="148" text-anchor="middle" font-family="var(--font-mono)" font-size="11" font-weight="700" fill="var(--on-surface)">DATA</text>
+          <text x="156" y="148" text-anchor="middle" font-family="var(--font-mono)" font-size="11" font-weight="700" fill="var(--on-surface)">GND</text>
+        </svg>`
+      },
+      pir: {
+        title: `PIR 人體紅外線感測器 (HC-SR501)`,
+        signal: `數位高/低電位輸出`,
+        principle: `PIR 代表「被動式紅外線」（Passive Infrared）。它本身不發射光線，而是透過白色高爾夫球狀的菲涅耳透鏡接收人體體溫發出的紅外線輻射變化。只要有人在前方移動，OUT 腳位就會輸出 HIGH (3.3V–5V) 訊號！`,
+        apps: `大樓樓梯間自動感應燈、商店自動門、無人智慧防盜警報器、節能冷氣自動關閉。`,
+        pins: [
+          [`VCC`, `接 Arduino 5V 電源正極`],
+          [`OUT`, `數位訊號輸出：偵測到人體移動為 HIGH，靜止無人為 LOW`],
+          [`GND`, `接 Arduino GND 接地端`]
+        ],
+        svg: `<svg viewBox="0 0 260 155" width="240" aria-label="PIR 人體紅外線感測器圖">
+          <rect x="70" y="75" width="120" height="32" fill="var(--positive)" stroke="var(--outline)" stroke-width="3"/>
+          <path d="M85,75 A45,45 0 0,1 175,75 Z" fill="var(--surface-container-low)" stroke="var(--outline)" stroke-width="3"/>
+          <path d="M100,75 A30,30 0 0,1 160,75" fill="none" stroke="var(--outline-variant)" stroke-width="2"/>
+          <line x1="100" y1="107" x2="100" y2="132" stroke="var(--pcb-gold)" stroke-width="5"/>
+          <line x1="130" y1="107" x2="130" y2="132" stroke="var(--pcb-gold)" stroke-width="5"/>
+          <line x1="160" y1="107" x2="160" y2="132" stroke="var(--pcb-gold)" stroke-width="5"/>
+          <text x="100" y="148" text-anchor="middle" font-family="var(--font-mono)" font-size="11" font-weight="700" fill="var(--on-surface)">VCC</text>
+          <text x="130" y="148" text-anchor="middle" font-family="var(--font-mono)" font-size="11" font-weight="700" fill="var(--on-surface)">OUT</text>
+          <text x="160" y="148" text-anchor="middle" font-family="var(--font-mono)" font-size="11" font-weight="700" fill="var(--on-surface)">GND</text>
+        </svg>`
+      },
+      button: {
+        title: `輕觸按鍵開關 (Pushbutton)`,
+        signal: `數位開關輸入 (HIGH / LOW)`,
+        principle: `按住時內部金屬彈片導通電路，放開時自動彈回斷開。為了避免未按下時腳位懸空收到雜訊亂跳，最簡便的做法是在 setup() 使用 pinMode(pin, INPUT_PULLUP) 啟用晶片內建上拉電阻：未按讀 HIGH，按下接地讀 LOW！`,
+        apps: `電子琴琴鍵、搶答器按鈕、行人紅綠燈觸發鈕、遊戲手把按鍵。`,
+        pins: [
+          [`左側腳位`, `接至 Arduino 數位腳位（例如 Pin 2）`],
+          [`右側對角腳位`, `接至 GND（使用 INPUT_PULLUP 模式時）或搭配 10kΩ 下拉電阻`]
+        ],
+        svg: `<svg viewBox="0 0 260 155" width="240" aria-label="輕觸按鍵開關構造圖">
+          <rect x="85" y="30" width="90" height="75" fill="var(--pcb-silver)" stroke="var(--outline)" stroke-width="3"/>
+          <circle cx="130" cy="67" r="22" fill="var(--primary)" stroke="var(--outline)" stroke-width="3"/>
+          <line x1="65" y1="45" x2="85" y2="45" stroke="var(--outline)" stroke-width="5"/>
+          <line x1="65" y1="90" x2="85" y2="90" stroke="var(--outline)" stroke-width="5"/>
+          <line x1="175" y1="45" x2="195" y2="45" stroke="var(--outline)" stroke-width="5"/>
+          <line x1="175" y1="90" x2="195" y2="90" stroke="var(--outline)" stroke-width="5"/>
+          <text x="130" y="130" text-anchor="middle" font-family="var(--font-mono)" font-size="11" font-weight="700" fill="var(--on-surface)">跨接麵包板溝槽最不易接錯</text>
+        </svg>`
+      }
+    };
+
+    function selectSensor(sensorId) {
+      const s = SENSORS_DATA[sensorId];
+      if (!s) return;
+      APP_STATE.activeSensorId = sensorId;
+
+      ['hcsr04', 'ldr', 'dht', 'pir', 'button'].forEach(function (id) {
+        const btn = document.getElementById('sensor-tab-' + id);
+        if (btn) {
+          btn.classList.toggle('is-active', id === sensorId);
+          btn.setAttribute('aria-selected', id === sensorId ? 'true' : 'false');
+        }
+      });
+
+      const svgBox = document.getElementById('sensor-svg-box');
+      const titleEl = document.getElementById('sensor-title');
+      const sigEl = document.getElementById('sensor-signal-tag');
+      const prinEl = document.getElementById('sensor-principle');
+      const appsEl = document.getElementById('sensor-apps');
+      const tbody = document.getElementById('sensor-pins-tbody');
+
+      if (svgBox) svgBox.innerHTML = s.svg;
+      if (titleEl) titleEl.textContent = s.title;
+      if (sigEl) sigEl.textContent = s.signal;
+      if (prinEl) prinEl.textContent = s.principle;
+      if (appsEl) appsEl.textContent = s.apps;
+      if (tbody) {
+        tbody.innerHTML = s.pins.map(function (row) {
+          return `<tr><td><code>${row[0]}</code></td><td>${row[1]}</td></tr>`;
+        }).join('');
+      }
+    }
+
+    /* ================================================================
+       PART 04: 5 INTERACTIVE LABS DATA & WORKBENCH
+       ================================================================ */
+    const LABS_DATA = [
+      {
+        num: `實驗 01`,
+        concept: `數位輸出與計時控制`,
+        title: `智慧紅綠燈系統`,
+        goal: `學會使用多個數位輸出腳位控制紅、黃、綠三色 LED，模擬真實路口紅綠燈變換節奏，並加入綠燈轉黃燈前的提醒閃爍與行人按鈕優先切換。`,
+        bom: [
+          `Arduino Uno 開發板 × 1`,
+          `紅、黃、綠 5mm LED × 各 1 顆`,
+          `220Ω 限流電阻 × 3 顆（紅紅棕金）`,
+          `輕觸按鍵 × 1 顆（行人按鈕，選配）`,
+          `麵包板與杜邦線 × 數條`
+        ],
+        wiring: [
+          [`紅燈 LED 正極（長腳）`, `串聯 220Ω 電阻 → Pin 13`],
+          [`黃燈 LED 正極（長腳）`, `串聯 220Ω 電阻 → Pin 12`],
+          [`綠燈 LED 正極（長腳）`, `串聯 220Ω 電阻 → Pin 11`],
+          [`三顆 LED 負極（短腳）`, `接至麵包板藍色軌 → Arduino GND`]
+        ],
+        wiringSvg: `<svg viewBox="0 0 320 120" aria-label="智慧紅綠燈接線圖">
+          <rect x="10" y="15" width="76" height="90" fill="var(--pcb-blue)" stroke="var(--outline)" stroke-width="2.5"/>
+          <text x="48" y="38" text-anchor="middle" font-family="var(--font-mono)" font-size="10" font-weight="700" fill="var(--on-primary)">Pin 13</text>
+          <text x="48" y="58" text-anchor="middle" font-family="var(--font-mono)" font-size="10" font-weight="700" fill="var(--on-primary)">Pin 12</text>
+          <text x="48" y="78" text-anchor="middle" font-family="var(--font-mono)" font-size="10" font-weight="700" fill="var(--on-primary)">Pin 11</text>
+          <text x="48" y="98" text-anchor="middle" font-family="var(--font-mono)" font-size="10" font-weight="700" fill="var(--primary-container)">GND</text>
+          <line x1="86" y1="34" x2="180" y2="34" stroke="var(--wire-red)" stroke-width="3"/>
+          <line x1="86" y1="54" x2="180" y2="54" stroke="var(--wire-yellow)" stroke-width="3"/>
+          <line x1="86" y1="74" x2="180" y2="74" stroke="var(--wire-green)" stroke-width="3"/>
+          <rect x="130" y="28" width="28" height="12" fill="var(--primary-container)" stroke="var(--outline)" stroke-width="1.5"/>
+          <rect x="130" y="48" width="28" height="12" fill="var(--primary-container)" stroke="var(--outline)" stroke-width="1.5"/>
+          <rect x="130" y="68" width="28" height="12" fill="var(--primary-container)" stroke="var(--outline)" stroke-width="1.5"/>
+          <circle cx="195" cy="34" r="9" fill="var(--led-red-on)" stroke="var(--outline)" stroke-width="2"/>
+          <circle cx="195" cy="54" r="9" fill="var(--led-yellow-on)" stroke="var(--outline)" stroke-width="2"/>
+          <circle cx="195" cy="74" r="9" fill="var(--led-green-on)" stroke="var(--outline)" stroke-width="2"/>
+          <path d="M204,34 L250,34 L250,94 L86,94" fill="none" stroke="var(--outline)" stroke-width="2.5"/>
+          <line x1="204" y1="54" x2="250" y2="54" stroke="var(--outline)" stroke-width="2.5"/>
+          <line x1="204" y1="74" x2="250" y2="74" stroke="var(--outline)" stroke-width="2.5"/>
+          <text x="278" y="60" text-anchor="middle" font-family="var(--font-label)" font-size="10" font-weight="700" fill="var(--on-surface)">220Ω 共地</text>
+        </svg>`,
+        code: [
+          { txt: `const int RED_PIN = 13;`, exp: `宣告常數變數 RED_PIN 代表紅燈接在第 13 號腳位，方便日後修改。`, concept: `const int 唯讀整數變數` },
+          { txt: `const int YELLOW_PIN = 12;`, exp: `宣告常數變數 YELLOW_PIN 代表黃燈接在第 12 號腳位。`, concept: `腳位命名習慣` },
+          { txt: `const int GREEN_PIN = 11;`, exp: `宣告常數變數 GREEN_PIN 代表綠燈接在第 11 號腳位。`, concept: `腳位命名習慣` },
+          { txt: `void setup() {`, exp: `Arduino 開機或重設時只執行一次的初始化函式開頭。`, concept: `setup() 初始化區` },
+          { txt: `  pinMode(RED_PIN, OUTPUT);`, exp: `設定紅燈腳位為「輸出模式」，讓 Arduino 能送出 5V 電壓。`, concept: `pinMode(腳位, 模式)` },
+          { txt: `  pinMode(YELLOW_PIN, OUTPUT);`, exp: `設定黃燈腳位為輸出模式。`, concept: `OUTPUT 輸出模式` },
+          { txt: `  pinMode(GREEN_PIN, OUTPUT);`, exp: `設定綠燈腳位為輸出模式。`, concept: `OUTPUT 輸出模式` },
+          { txt: `}`, exp: `結束 setup() 函式。`, concept: `大括號成對出現` },
+          { txt: `void loop() {`, exp: `主迴圈開頭，會不斷由上往下反覆循環執行。`, concept: `loop() 無限迴圈` },
+          { txt: `  digitalWrite(GREEN_PIN, HIGH);`, exp: `綠燈腳位輸出 5V 高電位，點亮綠燈。`, concept: `digitalWrite(腳位, HIGH/LOW)` },
+          { txt: `  delay(4000);`, exp: `維持綠燈亮起 4000 毫秒（也就是 4 秒鐘）。`, concept: `delay(毫秒)` },
+          { txt: `  for (int i = 0; i < 3; i++) {`, exp: `使用 for 迴圈重複 3 次，製作綠燈轉黃燈前的閃爍警告！`, concept: `for 計數迴圈` },
+          { txt: `    digitalWrite(GREEN_PIN, LOW);  delay(300);`, exp: `熄滅綠燈並等待 0.3 秒。`, concept: `閃爍滅燈間隔` },
+          { txt: `    digitalWrite(GREEN_PIN, HIGH); delay(300);`, exp: `再點亮綠燈並等待 0.3 秒。`, concept: `閃爍亮燈間隔` },
+          { txt: `  }`, exp: `結束閃爍 3 次的 for 迴圈。`, concept: `迴圈結束` },
+          { txt: `  digitalWrite(GREEN_PIN, LOW);`, exp: `確保綠燈完全熄滅，準備切換黃燈。`, concept: `互斥燈號邏輯` },
+          { txt: `  digitalWrite(YELLOW_PIN, HIGH); delay(1500);`, exp: `點亮黃燈 1.5 秒提醒減速。`, concept: `黃燈緩衝時間` },
+          { txt: `  digitalWrite(YELLOW_PIN, LOW);`, exp: `熄滅黃燈，準備轉為紅燈。`, concept: `狀態切換` },
+          { txt: `  digitalWrite(RED_PIN, HIGH); delay(4000);`, exp: `點亮紅燈禁止通行 4 秒鐘。`, concept: `紅燈停等時間` },
+          { txt: `  digitalWrite(RED_PIN, LOW);`, exp: `熄滅紅燈，回到 loop() 開頭再次亮起綠燈！`, concept: `完成一輪週期` },
+          { txt: `}`, exp: `結束 loop() 函式。`, concept: `迴圈循環` }
+        ],
+        challengeQ: `如果路口想加入「深夜時段只讓黃燈閃爍」或「東西向與南北向雙組紅綠燈連動」，程式架構要怎麼改？`,
+        challengeHint: `可以把「白天正常模式」與「深夜閃黃燈模式」分別寫成兩個自訂函式，再搭配時間或光敏電阻判斷該執行哪一個；雙向路口只要將東西向紅燈與南北向綠燈同步點亮（並預留 1 秒全紅緩衝時間防撞）即可！`
+      },
+      {
+        num: `實驗 02`,
+        concept: `數位輸入與聲音頻率輸出`,
+        title: `互動按鍵蜂鳴器電子琴`,
+        goal: `利用 Arduino 晶片內建的 INPUT_PULLUP 上拉電阻讀取 4 顆琴鍵按壓狀態，並透過 tone() 函式驅動無源蜂鳴器奏出 Do、Re、Mi、Fa 音階！`,
+        bom: [
+          `Arduino Uno 開發板 × 1`,
+          `無源蜂鳴器 (Passive Buzzer) × 1 顆`,
+          `輕觸按鍵 × 4 顆`,
+          `5mm 指示 LED × 1 顆 + 220Ω 電阻 × 1 顆`,
+          `麵包板與杜邦線 × 數條`
+        ],
+        wiring: [
+          [`琴鍵 1–4（Do/Re/Mi/Fa）`, `分別接至 Pin 2、Pin 3、Pin 4、Pin 5，另一端全接 GND`],
+          [`無源蜂鳴器正極（+）`, `接至 Pin 8`],
+          [`無源蜂鳴器負極（-）`, `接至 GND`],
+          [`指示 LED 正極`, `串聯 220Ω 電阻接 Pin 13，負極接 GND`]
+        ],
+        wiringSvg: `<svg viewBox="0 0 320 120" aria-label="按鍵蜂鳴器電子琴接線圖">
+          <rect x="10" y="12" width="84" height="96" fill="var(--pcb-blue)" stroke="var(--outline)" stroke-width="2.5"/>
+          <text x="52" y="34" text-anchor="middle" font-family="var(--font-mono)" font-size="10" font-weight="700" fill="var(--on-primary)">Pin 2~5</text>
+          <text x="52" y="64" text-anchor="middle" font-family="var(--font-mono)" font-size="10" font-weight="700" fill="var(--on-primary)">Pin 8</text>
+          <text x="52" y="92" text-anchor="middle" font-family="var(--font-mono)" font-size="10" font-weight="700" fill="var(--primary-container)">GND</text>
+          <line x1="94" y1="30" x2="170" y2="30" stroke="var(--wire-blue)" stroke-width="3"/>
+          <rect x="170" y="18" width="44" height="24" fill="var(--surface-container-low)" stroke="var(--outline)" stroke-width="2"/>
+          <text x="192" y="34" text-anchor="middle" font-family="var(--font-label)" font-size="10" font-weight="700" fill="var(--on-surface)">4琴鍵</text>
+          <line x1="94" y1="60" x2="175" y2="60" stroke="var(--wire-red)" stroke-width="3"/>
+          <circle cx="192" cy="60" r="14" fill="var(--primary)" stroke="var(--outline)" stroke-width="2"/>
+          <text x="192" y="64" text-anchor="middle" font-family="var(--font-mono)" font-size="9" font-weight="700" fill="var(--primary-container)">Buzzer</text>
+          <path d="M214,30 L260,30 L260,88 L94,88" fill="none" stroke="var(--outline)" stroke-width="2.5"/>
+          <line x1="206" y1="60" x2="260" y2="60" stroke="var(--outline)" stroke-width="2.5"/>
+        </svg>`,
+        code: [
+          { txt: `const int BUZZER_PIN = 8;`, exp: `指定無源蜂鳴器接在第 8 號數位腳位。`, concept: `蜂鳴器腳位設定` },
+          { txt: `const int LED_PIN = 13;`, exp: `指定按鍵發聲時同步亮起的指示燈腳位。`, concept: `視覺同步回饋` },
+          { txt: `void setup() {`, exp: `初始化腳位方向。`, concept: `setup() 初始化` },
+          { txt: `  for (int p = 2; p <= 5; p++) {`, exp: `用迴圈一次設定 Pin 2 到 Pin 5 四顆琴鍵！`, concept: `批次初始化` },
+          { txt: `    pinMode(p, INPUT_PULLUP);`, exp: `關鍵！啟用內建上拉電阻：沒按鍵時讀為 HIGH，按下接地時讀為 LOW。`, concept: `INPUT_PULLUP 上拉輸入` },
+          { txt: `  }`, exp: `結束迴圈。`, concept: `迴圈結束` },
+          { txt: `  pinMode(BUZZER_PIN, OUTPUT);`, exp: `設定蜂鳴器腳位為輸出。`, concept: `OUTPUT 輸出` },
+          { txt: `  pinMode(LED_PIN, OUTPUT);`, exp: `設定 LED 腳位為輸出。`, concept: `OUTPUT 輸出` },
+          { txt: `}`, exp: `結束 setup()。`, concept: `初始化完成` },
+          { txt: `void loop() {`, exp: `不斷掃描目前有沒有任何琴鍵被按下。`, concept: `loop() 掃描` },
+          { txt: `  if (digitalRead(2) == LOW) {`, exp: `若 Pin 2 按下（導通至 GND 變成 LOW），演奏中央 Do！`, concept: `digitalRead() 條件判斷` },
+          { txt: `    tone(BUZZER_PIN, 262);`, exp: `讓蜂鳴器震動每秒 262 次（262 Hz），發出標準 Do 音。`, concept: `tone(腳位, 頻率Hz)` },
+          { txt: `    digitalWrite(LED_PIN, HIGH);`, exp: `同時點亮 LED 指示燈。`, concept: `聲光同步` },
+          { txt: `  } else if (digitalRead(3) == LOW) {`, exp: `否則檢查 Pin 3 是否按下，演奏 Re（294 Hz）。`, concept: `else if 多條件分支` },
+          { txt: `    tone(BUZZER_PIN, 294); digitalWrite(LED_PIN, HIGH);`, exp: `發出 Re 音並亮燈。`, concept: `294 Hz = D4` },
+          { txt: `  } else if (digitalRead(4) == LOW) {`, exp: `否則檢查 Pin 4，演奏 Mi（330 Hz）。`, concept: `330 Hz = E4` },
+          { txt: `    tone(BUZZER_PIN, 330); digitalWrite(LED_PIN, HIGH);`, exp: `發出 Mi 音並亮燈。`, concept: `多音階控制` },
+          { txt: `  } else if (digitalRead(5) == LOW) {`, exp: `否則檢查 Pin 5，演奏 Fa（349 Hz）。`, concept: `349 Hz = F4` },
+          { txt: `    tone(BUZZER_PIN, 349); digitalWrite(LED_PIN, HIGH);`, exp: `發出 Fa 音並亮燈。`, concept: `多音階控制` },
+          { txt: `  } else {`, exp: `四顆按鍵都沒被按下的情況。`, concept: `else 預設狀態` },
+          { txt: `    noTone(BUZZER_PIN); digitalWrite(LED_PIN, LOW);`, exp: `立刻停止發聲並關閉指示燈！`, concept: `noTone() 靜音` },
+          { txt: `  }`, exp: `結束 if 判斷。`, concept: `分支結束` },
+          { txt: `}`, exp: `回到 loop() 開頭繼續偵測。`, concept: `迴圈結束` }
+        ],
+        challengeQ: `如果同時按下 Do 和 Re 兩顆琴鍵，蜂鳴器會發出什麼聲音？為什麼 Arduino 的 tone() 函式沒辦法像真實鋼琴一樣同時彈出和弦？`,
+        challengeHint: `因為我們寫的是 if / else if 順序判斷，會優先播放第一個符合條件的 Do 音；而且 Arduino Uno 單顆蜂鳴器在同一時間只能產生單一頻率的方波訊號（無法同時疊加兩個音高）。想讓電子琴會自己彈《小星星》，可以用陣列儲存音符頻率與節拍長度再依序呼叫 tone()！`
+      },
+      {
+        num: `實驗 03`,
+        concept: `類比讀取與 PWM 呼吸調光`,
+        title: `光控自動調光小夜燈`,
+        goal: `透過光敏電阻分壓電路讀取環境光線強弱（0–1023），利用 map() 與 constrain() 轉換數值，以 PWM（analogWrite）讓小夜燈實現「天越黑、燈越亮」的無段平滑調光。`,
+        bom: [
+          `Arduino Uno 開發板 × 1`,
+          `光敏電阻 (LDR) × 1 顆`,
+          `10kΩ 分壓電阻 × 1 顆（棕黑橙金）`,
+          `高亮度暖白光或黃光 LED × 1 顆 + 220Ω 電阻 × 1 顆`,
+          `麵包板與杜邦線 × 數條`
+        ],
+        wiring: [
+          [`光敏電阻一端`, `接至 Arduino 5V`],
+          [`光敏電阻另一端與 10kΩ 電阻相接`, `共用節點拉線至類比腳位 A0（10kΩ 另一端接 GND）`],
+          [`小夜燈 LED 正極（長腳）`, `串聯 220Ω 電阻接至支援 ~PWM 的 Pin 9`],
+          [`小夜燈 LED 負極（短腳）`, `接至 Arduino GND`]
+        ],
+        wiringSvg: `<svg viewBox="0 0 320 120" aria-label="光控調光小夜燈接線圖">
+          <rect x="10" y="12" width="80" height="96" fill="var(--pcb-blue)" stroke="var(--outline)" stroke-width="2.5"/>
+          <text x="50" y="34" text-anchor="middle" font-family="var(--font-mono)" font-size="10" font-weight="700" fill="var(--primary-container)">5V</text>
+          <text x="50" y="58" text-anchor="middle" font-family="var(--font-mono)" font-size="10" font-weight="700" fill="var(--on-primary)">A0 (IN)</text>
+          <text x="50" y="82" text-anchor="middle" font-family="var(--font-mono)" font-size="10" font-weight="700" fill="var(--on-primary)">~Pin 9</text>
+          <text x="50" y="100" text-anchor="middle" font-family="var(--font-mono)" font-size="10" font-weight="700" fill="var(--primary-container)">GND</text>
+          <!-- LDR Divider -->
+          <line x1="90" y1="30" x2="155" y2="30" stroke="var(--wire-red)" stroke-width="2.5"/>
+          <circle cx="170" cy="30" r="12" fill="var(--primary-container)" stroke="var(--outline)" stroke-width="2"/>
+          <text x="170" y="33" text-anchor="middle" font-family="var(--font-mono)" font-size="8" font-weight="700">LDR</text>
+          <path d="M182,30 L205,30 L205,54 L90,54" fill="none" stroke="var(--wire-blue)" stroke-width="2.5"/>
+          <rect x="215" y="48" width="32" height="12" fill="var(--surface-container-low)" stroke="var(--outline)" stroke-width="1.5"/>
+          <text x="231" y="57" text-anchor="middle" font-family="var(--font-mono)" font-size="8" font-weight="700">10kΩ</text>
+          <line x1="205" y1="54" x2="215" y2="54" stroke="var(--outline)" stroke-width="2"/>
+          <!-- PWM LED -->
+          <line x1="90" y1="78" x2="165" y2="78" stroke="var(--wire-yellow)" stroke-width="3"/>
+          <circle cx="180" cy="78" r="10" fill="var(--led-yellow-on)" stroke="var(--outline)" stroke-width="2"/>
+          <path d="M190,78 L265,78 L265,98 L90,98" fill="none" stroke="var(--outline)" stroke-width="2.5"/>
+          <line x1="247" y1="54" x2="265" y2="54" stroke="var(--outline)" stroke-width="2"/>
+          <line x1="265" y1="54" x2="265" y2="78" stroke="var(--outline)" stroke-width="2"/>
+        </svg>`,
+        code: [
+          { txt: `const int LDR_PIN = A0;`, exp: `指定光敏電阻分壓訊號接在類比腳位 A0。`, concept: `Analog 類比輸入腳位` },
+          { txt: `const int LED_PIN = 9;`, exp: `指定夜燈 LED 接在有波浪號「~」支援 PWM 的 Pin 9。`, concept: `PWM (~) 腳位限制` },
+          { txt: `void setup() {`, exp: `初始化序列埠與輸出腳位。`, concept: `setup() 初始化` },
+          { txt: `  pinMode(LED_PIN, OUTPUT);`, exp: `設定 Pin 9 為輸出（A0 為類比輸入，不需 pinMode）。`, concept: `腳位模式設定` },
+          { txt: `  Serial.begin(9600);`, exp: `開啟每秒 9600 位元傳輸速率的序列埠監控視窗，方便觀察光度數值！`, concept: `Serial.begin() 除錯` },
+          { txt: `}`, exp: `結束 setup()。`, concept: `初始化完成` },
+          { txt: `void loop() {`, exp: `持續讀取光線並即時調整亮度。`, concept: `loop() 迴圈` },
+          { txt: `  int lightVal = analogRead(LDR_PIN);`, exp: `讀取 A0 電壓轉換後的數值（0 代表全黑，1023 代表極亮）。`, concept: `analogRead() 0–1023` },
+          { txt: `  int brightness = map(lightVal, 150, 850, 255, 0);`, exp: `把光線範圍 (150~850) 反向對應到 PWM 亮度 (255 最亮 ~ 0 全滅)！`, concept: `map() 數值等比例映射` },
+          { txt: `  brightness = constrain(brightness, 0, 255);`, exp: `強制把亮度數值鎖定在合法的 0 到 255 之間，避免溢出出錯。`, concept: `constrain() 上下限保護` },
+          { txt: `  analogWrite(LED_PIN, brightness);`, exp: `透過高速脈衝寬度調變 (PWM) 控制 LED 實際亮度！`, concept: `analogWrite() PWM 輸出` },
+          { txt: `  Serial.println(lightVal);`, exp: `把目前測得的光線數值印在電腦螢幕上查看。`, concept: `序列埠即時監看` },
+          { txt: `  delay(50);`, exp: `稍作延遲 50 毫秒讓感測器讀數與燈光變化更平順。`, concept: `取樣穩定延遲` },
+          { txt: `}`, exp: `結束 loop()。`, concept: `迴圈循環` }
+        ],
+        challengeQ: `如果把這盞夜燈放在窗邊，傍晚天色剛暗時車燈偶爾掃過會讓小夜燈一閃一閃的，要如何在程式裡避免「短暫光影閃爍」？`,
+        challengeHint: `可以使用「移動平均濾波」（連續讀取 10 次 analogRead 取平均值再調光），或是設定「遲滯區間」（例如天暗低於 300 才開燈、天亮高於 450 才關燈），就能防止臨界點附近反覆閃爍！`
+      },
+      {
+        num: `實驗 04`,
+        concept: `距離計算與蜂鳴器頻率變換`,
+        title: `超音波倒車雷達／安全測距警報器`,
+        goal: `利用 HC-SR04 發射超音波與 pulseIn() 量測回波時間，套用音速公式換算公分距離，實現綠燈安全、黃燈慢速嗶聲提醒、紅燈急促警報的三段式倒車雷達！`,
+        bom: [
+          `Arduino Uno 開發板 × 1`,
+          `HC-SR04 超音波感測器 × 1 顆`,
+          `無源蜂鳴器 × 1 顆`,
+          `綠、黃、紅 LED 各 × 1 顆 + 220Ω 電阻 × 3 顆`,
+          `麵包板與杜邦線 × 數條`
+        ],
+        wiring: [
+          [`HC-SR04 VCC / GND`, `分別接 Arduino 5V 與 GND`],
+          [`HC-SR04 Trig / Echo`, `Trig 接 Pin 9，Echo 接 Pin 10`],
+          [`蜂鳴器正極`, `接至 Pin 8（負極接 GND）`],
+          [`綠 / 黃 / 紅警示燈`, `分別串聯 220Ω 電阻接至 Pin 5、Pin 6、Pin 7`]
+        ],
+        wiringSvg: `<svg viewBox="0 0 320 120" aria-label="超音波倒車雷達接線圖">
+          <rect x="10" y="10" width="84" height="100" fill="var(--pcb-blue)" stroke="var(--outline)" stroke-width="2.5"/>
+          <text x="52" y="30" text-anchor="middle" font-family="var(--font-mono)" font-size="9.5" font-weight="700" fill="var(--on-primary)">Pin 9/10</text>
+          <text x="52" y="54" text-anchor="middle" font-family="var(--font-mono)" font-size="9.5" font-weight="700" fill="var(--on-primary)">Pin 8</text>
+          <text x="52" y="78" text-anchor="middle" font-family="var(--font-mono)" font-size="9.5" font-weight="700" fill="var(--on-primary)">Pin 5,6,7</text>
+          <text x="52" y="98" text-anchor="middle" font-family="var(--font-mono)" font-size="9.5" font-weight="700" fill="var(--primary-container)">5V / GND</text>
+          <!-- HC-SR04 -->
+          <rect x="155" y="14" width="76" height="32" fill="var(--tertiary)" stroke="var(--outline)" stroke-width="2"/>
+          <text x="193" y="34" text-anchor="middle" font-family="var(--font-mono)" font-size="10" font-weight="700" fill="var(--on-tertiary)">HC-SR04</text>
+          <line x1="94" y1="27" x2="155" y2="27" stroke="var(--wire-blue)" stroke-width="2.5"/>
+          <!-- Buzzer -->
+          <circle cx="175" cy="60" r="11" fill="var(--primary)" stroke="var(--outline)" stroke-width="2"/>
+          <line x1="94" y1="54" x2="164" y2="54" stroke="var(--wire-red)" stroke-width="2.5"/>
+          <!-- 3 LEDs -->
+          <line x1="94" y1="80" x2="210" y2="80" stroke="var(--wire-green)" stroke-width="2.5"/>
+          <circle cx="220" cy="80" r="7" fill="var(--led-green-on)" stroke="var(--outline)" stroke-width="1.5"/>
+          <circle cx="240" cy="80" r="7" fill="var(--led-yellow-on)" stroke="var(--outline)" stroke-width="1.5"/>
+          <circle cx="260" cy="80" r="7" fill="var(--led-red-on)" stroke="var(--outline)" stroke-width="1.5"/>
+        </svg>`,
+        code: [
+          { txt: `const int TRIG = 9, ECHO = 10, BUZZER = 8;`, exp: `定義超音波 Trig/Echo 與蜂鳴器腳位編號。`, concept: `多常數宣告` },
+          { txt: `const int LED_G = 5, LED_Y = 6, LED_R = 7;`, exp: `定義安全綠燈、警戒黃燈與危險紅燈的腳位。`, concept: `三段警示燈號` },
+          { txt: `void setup() {`, exp: `初始化各元件腳位。`, concept: `setup()` },
+          { txt: `  pinMode(TRIG, OUTPUT); pinMode(ECHO, INPUT);`, exp: `Trig 發射指令設為 OUTPUT，Echo 接收回波設為 INPUT。`, concept: `超音波收發設定` },
+          { txt: `  pinMode(BUZZER, OUTPUT);`, exp: `蜂鳴器設為輸出。`, concept: `OUTPUT` },
+          { txt: `  pinMode(LED_G, OUTPUT); pinMode(LED_Y, OUTPUT); pinMode(LED_R, OUTPUT);`, exp: `三個警示 LED 皆設為輸出。`, concept: `OUTPUT` },
+          { txt: `}`, exp: `結束 setup()。`, concept: `初始化完成` },
+          { txt: `void loop() {`, exp: `主迴圈：發射脈衝、計算距離、決定警報等級。`, concept: `loop()` },
+          { txt: `  digitalWrite(TRIG, LOW); delayMicroseconds(2);`, exp: `先給低電位 2 微秒確保訊號乾淨。`, concept: `delayMicroseconds` },
+          { txt: `  digitalWrite(TRIG, HIGH); delayMicroseconds(10);`, exp: `送出 10 微秒高電位脈衝，觸發感測器發射超音波！`, concept: `10µs 觸發脈衝` },
+          { txt: `  digitalWrite(TRIG, LOW);`, exp: `關閉觸發脈衝，準備接收回音。`, concept: `脈衝結束` },
+          { txt: `  long duration = pulseIn(ECHO, HIGH);`, exp: `測量 Echo 腳位維持高電位的時間（單位：微秒 µs）。`, concept: `pulseIn() 計時` },
+          { txt: `  float dist = duration * 0.034 / 2.0;`, exp: `往返時間 × 音速 (0.034 cm/µs) ÷ 2 = 單程障礙物距離（公分）！`, concept: `距離公式換算` },
+          { txt: `  if (dist < 20) {`, exp: `小於 20 公分進入極度危險區！`, concept: `危險距離判斷` },
+          { txt: `    digitalWrite(LED_R, HIGH); digitalWrite(LED_Y, LOW); digitalWrite(LED_G, LOW);`, exp: `只點亮紅燈，熄滅黃燈與綠燈。`, concept: `紅燈警報` },
+          { txt: `    tone(BUZZER, 1200, 80); delay(120);`, exp: `高頻 1200 Hz 急促短音，每 0.12 秒嗶一次！`, concept: `高頻急促警示` },
+          { txt: `  } else if (dist <= 50) {`, exp: `介於 20 至 50 公分屬於警戒區。`, concept: `警戒距離判斷` },
+          { txt: `    digitalWrite(LED_R, LOW); digitalWrite(LED_Y, HIGH); digitalWrite(LED_G, LOW);`, exp: `點亮黃燈提醒駕駛減速。`, concept: `黃燈警告` },
+          { txt: `    tone(BUZZER, 700, 100); delay(450);`, exp: `中頻 700 Hz 慢速嗶聲提醒，約每半秒響一次。`, concept: `中速間歇提示` },
+          { txt: `  } else {`, exp: `大於 50 公分屬於安全距離。`, concept: `安全距離` },
+          { txt: `    digitalWrite(LED_R, LOW); digitalWrite(LED_Y, LOW); digitalWrite(LED_G, HIGH);`, exp: `亮綠燈且保持靜音，安全倒車！`, concept: `綠燈安全通行` },
+          { txt: `    noTone(BUZZER); delay(150);`, exp: `關閉蜂鳴器聲音。`, concept: `靜音待機` },
+          { txt: `  }`, exp: `結束距離判斷。`, concept: `條件結束` },
+          { txt: `}`, exp: `回到開頭再次測距。`, concept: `迴圈循環` }
+        ],
+        challengeQ: `為什麼車子靠近柔軟的吸音泡棉，或是感測器斜斜對著平滑牆面時，測出來的距離會突然變很大或亂跳？`,
+        challengeHint: `超音波是聲波！遇到柔軟多孔材質會被「吸收」導致回音太弱收不到；遇到斜角光滑牆面會像鏡子一樣把聲波「反射到別的方向」（入射角等於反射角），感測器就接不到回波而產生超時誤差。`
+      },
+      {
+        num: `實驗 05`,
+        concept: `PIR 感測器與聲光聯動`,
+        title: `智慧防盜／人體接近感應警報器`,
+        goal: `結合 PIR 人體紅外線感測器與「布防切換開關」，設計只有在「警戒模式」下偵測到人員移動時，才會啟動紅藍警燈交替閃爍與高低雙音警報的防盜系統！`,
+        bom: [
+          `Arduino Uno 開發板 × 1`,
+          `PIR 人體紅外線感測器 (HC-SR501) × 1 顆`,
+          `輕觸按鍵 × 1 顆（切換布防 / 撤防模式）`,
+          `紅、藍 LED 各 × 1 顆 + 220Ω 電阻 × 2 顆`,
+          `無源蜂鳴器 × 1 顆`,
+          `麵包板與杜邦線 × 數條`
+        ],
+        wiring: [
+          [`PIR 感測器 VCC / GND`, `接 Arduino 5V 與 GND`],
+          [`PIR 訊號腳 OUT`, `接至 Pin 2`],
+          [`警戒開關按鈕`, `一端接 Pin 4（INPUT_PULLUP），另一端接 GND`],
+          [`紅/藍警燈與蜂鳴器`, `紅燈 Pin 11、藍燈 Pin 12（各串 220Ω）、蜂鳴器 Pin 8`]
+        ],
+        wiringSvg: `<svg viewBox="0 0 320 120" aria-label="智慧防盜系統接線圖">
+          <rect x="10" y="10" width="84" height="100" fill="var(--pcb-blue)" stroke="var(--outline)" stroke-width="2.5"/>
+          <text x="52" y="30" text-anchor="middle" font-family="var(--font-mono)" font-size="9.5" font-weight="700" fill="var(--on-primary)">Pin 2 (PIR)</text>
+          <text x="52" y="52" text-anchor="middle" font-family="var(--font-mono)" font-size="9.5" font-weight="700" fill="var(--on-primary)">Pin 4 (BTN)</text>
+          <text x="52" y="74" text-anchor="middle" font-family="var(--font-mono)" font-size="9.5" font-weight="700" fill="var(--on-primary)">Pin 11/12</text>
+          <text x="52" y="96" text-anchor="middle" font-family="var(--font-mono)" font-size="9.5" font-weight="700" fill="var(--primary-container)">Pin 8 / GND</text>
+          <!-- PIR Dome -->
+          <path d="M150,42 A22,22 0 0,1 194,42 Z" fill="var(--surface-container-low)" stroke="var(--outline)" stroke-width="2"/>
+          <rect x="145" y="42" width="54" height="12" fill="var(--positive)" stroke="var(--outline)" stroke-width="1.5"/>
+          <line x1="94" y1="28" x2="145" y2="48" stroke="var(--wire-green)" stroke-width="2.5"/>
+          <!-- Red/Blue LEDs -->
+          <line x1="94" y1="72" x2="180" y2="72" stroke="var(--wire-red)" stroke-width="2.5"/>
+          <circle cx="192" cy="72" r="8" fill="var(--led-red-on)" stroke="var(--outline)" stroke-width="2"/>
+          <circle cx="218" cy="72" r="8" fill="var(--led-blue-on)" stroke="var(--outline)" stroke-width="2"/>
+          <!-- Buzzer -->
+          <circle cx="255" cy="92" r="11" fill="var(--primary)" stroke="var(--outline)" stroke-width="2"/>
+          <line x1="94" y1="92" x2="244" y2="92" stroke="var(--wire-yellow)" stroke-width="2.5"/>
+        </svg>`,
+        code: [
+          { txt: `const int PIR_PIN = 2, ARM_BTN = 4;`, exp: `Pin 2 接 PIR 人體感測器，Pin 4 接布防／撤防按鈕。`, concept: `雙輸入腳位定義` },
+          { txt: `const int LED_R = 11, LED_B = 12, BUZZ = 8;`, exp: `定義紅藍雙色警燈與警報蜂鳴器腳位。`, concept: `聲光聯動輸出` },
+          { txt: `bool isArmed = true;`, exp: `布林變數記錄系統目前是否處於「警戒布防中」（true/false）。`, concept: `bool 布林狀態` },
+          { txt: `void setup() {`, exp: `設定各元件的輸出與輸入模式。`, concept: `setup()` },
+          { txt: `  pinMode(PIR_PIN, INPUT);`, exp: `PIR 模組本身會主動輸出 0V 或 3.3V，設為一般 INPUT 即可。`, concept: `PIR 數位輸入` },
+          { txt: `  pinMode(ARM_BTN, INPUT_PULLUP);`, exp: `布防按鈕啟用內建上拉電阻。`, concept: `INPUT_PULLUP` },
+          { txt: `  pinMode(LED_R, OUTPUT); pinMode(LED_B, OUTPUT); pinMode(BUZZ, OUTPUT);`, exp: `紅藍燈與蜂鳴器皆設為輸出模式。`, concept: `OUTPUT` },
+          { txt: `}`, exp: `結束 setup()。`, concept: `初始化完成` },
+          { txt: `void loop() {`, exp: `持續檢查按鈕狀態與感測器訊號。`, concept: `loop()` },
+          { txt: `  if (digitalRead(ARM_BTN) == LOW) {`, exp: `如果使用者按下警戒切換按鈕（變為 LOW）。`, concept: `按鈕觸發切換` },
+          { txt: `    isArmed = !isArmed;`, exp: `驚嘆號「!」代表反轉布林值：原本布防變撤防，原本撤防變布防！`, concept: `邏輯反轉 (!)` },
+          { txt: `    delay(300);`, exp: `加入 300 毫秒防彈跳延遲，避免按一下被誤判成連續好幾次！`, concept: `按鈕防彈跳 (Debounce)` },
+          { txt: `  }`, exp: `結束按鈕檢查。`, concept: `條件結束` },
+          { txt: `  if (isArmed && digitalRead(PIR_PIN) == HIGH) {`, exp: `同時滿足「布防開啟」且「PIR 偵測到人體 (HIGH)」兩個條件時觸發！`, concept: `邏輯且 (&&) 運算` },
+          { txt: `    digitalWrite(LED_R, HIGH); digitalWrite(LED_B, LOW);`, exp: `紅燈亮、藍燈滅。`, concept: `警燈閃爍第一拍` },
+          { txt: `    tone(BUZZ, 880); delay(200);`, exp: `發出 880 Hz 高音警報持續 0.2 秒。`, concept: `高音警報` },
+          { txt: `    digitalWrite(LED_R, LOW); digitalWrite(LED_B, HIGH);`, exp: `換成紅燈滅、藍燈亮。`, concept: `警燈閃爍第二拍` },
+          { txt: `    tone(BUZZ, 660); delay(200);`, exp: `切換為 660 Hz 低音，形成「歐伊歐伊」雙音警笛聲！`, concept: `高低雙音警笛` },
+          { txt: `  } else {`, exp: `沒人靠近或處於撤防安全狀態時。`, concept: `安全待機` },
+          { txt: `    digitalWrite(LED_R, LOW); digitalWrite(LED_B, LOW); noTone(BUZZ);`, exp: `關閉紅藍警燈並讓蜂鳴器安靜。`, concept: `解除聲光輸出` },
+          { txt: `  }`, exp: `結束警報判斷。`, concept: `分支結束` },
+          { txt: `}`, exp: `回到開頭繼續偵測。`, concept: `迴圈循環` }
+        ],
+        challengeQ: `家裡有養貓咪或狗狗時，普通 PIR 感測器經常半夜誤報怎麼辦？`,
+        challengeHint: `有兩種工程解法：1. 硬體位置調整：把 PIR 裝在離地 1.2 公尺以上並用遮光板擋住下半部視角，只偵測人體高度區域；2. 軟體持續時間濾波：在程式裡要求 PIR 必須連續保持 HIGH 超過 1.5 秒才觸發警報，過濾掉寵物快速跑過的瞬間訊號！`
+      }
+    ];
+
+    function stopAllSimulators() {
+      if (trafficInterval) { clearInterval(trafficInterval); trafficInterval = null; }
+      if (radarBeepTimer) { clearInterval(radarBeepTimer); radarBeepTimer = null; }
+      if (alarmTimer) { clearInterval(alarmTimer); alarmTimer = null; }
+    }
+
+    function selectLab(idx) {
+      stopAllSimulators();
+      APP_STATE.activeLabIndex = idx;
+      currentCodeLine = 0;
+
+      for (let i = 0; i < 5; i++) {
+        const card = document.getElementById('lab-card-' + i);
+        if (card) card.classList.toggle('is-active', i === idx);
+      }
+
+      const lab = LABS_DATA[idx];
+      if (!lab) return;
+
+      const numTag = document.getElementById('lab-num-tag');
+      const conceptTag = document.getElementById('lab-concept-tag');
+      const titleEl = document.getElementById('lab-title');
+      const goalEl = document.getElementById('lab-goal');
+      const bomList = document.getElementById('lab-bom-list');
+      const wiringSvg = document.getElementById('lab-wiring-svg');
+      const wiringTbody = document.getElementById('lab-wiring-tbody');
+      const chQ = document.getElementById('lab-challenge-q');
+      const chH = document.getElementById('lab-challenge-hint');
+      const chDetails = document.getElementById('lab-challenge-details');
+
+      if (numTag) numTag.textContent = lab.num;
+      if (conceptTag) conceptTag.textContent = lab.concept;
+      if (titleEl) titleEl.textContent = lab.title;
+      if (goalEl) goalEl.textContent = lab.goal;
+      if (bomList) {
+        bomList.innerHTML = lab.bom.map(function (item) {
+          return `<li>${item}</li>`;
+        }).join('');
+      }
+      if (wiringSvg) wiringSvg.innerHTML = lab.wiringSvg;
+      if (wiringTbody) {
+        wiringTbody.innerHTML = lab.wiring.map(function (row) {
+          return `<tr><td><strong>${row[0]}</strong></td><td>${row[1]}</td></tr>`;
+        }).join('');
+      }
+      if (chQ) chQ.textContent = lab.challengeQ;
+      if (chH) chH.textContent = lab.challengeHint;
+      if (chDetails) chDetails.open = false;
+
+      updateCompleteBtnUI();
+      renderCodeLines(lab);
+      selectCodeLine(0);
+      mountLabSimulator(idx);
+      saveAppState();
+    }
+
+    function updateCompleteBtnUI() {
+      const btn = document.getElementById('btn-toggle-complete');
+      if (!btn) return;
+      const done = APP_STATE.completedLabs.includes(APP_STATE.activeLabIndex);
+      if (done) {
+        btn.className = 'btn btn-positive';
+        btn.innerHTML = '已完成此實驗（點擊取消）';
+      } else {
+        btn.className = 'btn btn-primary';
+        btn.innerHTML = '標記此實驗已完成';
+      }
+    }
+
+    function toggleCurrentLabComplete() {
+      const idx = APP_STATE.activeLabIndex;
+      const pos = APP_STATE.completedLabs.indexOf(idx);
+      if (pos >= 0) {
+        APP_STATE.completedLabs.splice(pos, 1);
+      } else {
+        APP_STATE.completedLabs.push(idx);
+      }
+      updateCompleteBtnUI();
+      updateProgressUI();
+      saveAppState();
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function renderCodeLines(lab) {
+      const panel = document.getElementById('lab-code-lines');
+      if (!panel) return;
+      panel.innerHTML = lab.code.map(function (lineObj, i) {
+        return `<div class="code-line" id="code-row-${i}" role="option" aria-selected="false" onclick="selectCodeLine(${i})"><span class="code-ln">${i + 1}</span><span class="code-txt">${escapeHtml(lineObj.txt)}</span></div>`;
+      }).join('');
+    }
+
+    function selectCodeLine(lineIdx) {
+      const lab = LABS_DATA[APP_STATE.activeLabIndex];
+      if (!lab || !lab.code[lineIdx]) return;
+      currentCodeLine = lineIdx;
+
+      lab.code.forEach(function (_, i) {
+        const row = document.getElementById('code-row-' + i);
+        if (row) {
+          row.classList.toggle('is-selected', i === lineIdx);
+          row.setAttribute('aria-selected', i === lineIdx ? 'true' : 'false');
+        }
+      });
+
+      const obj = lab.code[lineIdx];
+      const badge = document.getElementById('code-line-badge');
+      const preview = document.getElementById('code-line-preview');
+      const exp = document.getElementById('code-line-explanation');
+      const concept = document.getElementById('code-line-concept');
+
+      if (badge) badge.textContent = `第 ${lineIdx + 1} / ${lab.code.length} 行解析`;
+      if (preview) preview.textContent = obj.txt;
+      if (exp) exp.textContent = obj.exp;
+      if (concept) concept.textContent = obj.concept;
+    }
+
+    function stepCodeLine(delta) {
+      const lab = LABS_DATA[APP_STATE.activeLabIndex];
+      if (!lab) return;
+      let next = currentCodeLine + delta;
+      if (next < 0) next = 0;
+      if (next >= lab.code.length) next = lab.code.length - 1;
+      selectCodeLine(next);
+    }
+
+    function copyLabCode() {
+      const lab = LABS_DATA[APP_STATE.activeLabIndex];
+      const btn = document.getElementById('btn-copy-code');
+      if (!lab || !btn) return;
+      const fullText = lab.code.map(function (c) { return c.txt; }).join('\n');
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(fullText).then(function () {
+          btn.textContent = '已複製全部程式碼！';
+          setTimeout(function () { btn.textContent = '複製程式碼'; }, 1600);
+        });
+      } else {
+        btn.textContent = '請手動選取複製';
+      }
+    }
+
+    /* ================================================================
+       VIRTUAL HARDWARE SIMULATORS (5 LABS)
+       ================================================================ */
+    function mountLabSimulator(idx) {
+      const statusTag = document.getElementById('sim-status-tag');
+      for (let i = 0; i < 5; i++) {
+        const panel = document.getElementById('sim-panel-' + i);
+        if (panel) {
+          panel.style.display = (i === idx) ? 'grid' : 'none';
+        }
+      }
+
+      if (idx === 0) {
+        if (statusTag) statusTag.textContent = '自動運作中';
+        trafficPhase = 0;
+        trafficPaused = false;
+        const pauseBtn = document.getElementById('sim-tl-pause-btn');
+        if (pauseBtn) pauseBtn.textContent = '暫停循環';
+        updateTrafficLightsUI();
+        startTrafficLoop(1000);
+      } else if (idx === 1) {
+        if (statusTag) statusTag.textContent = '點擊或按鍵盤 1–4 彈奏';
+      } else if (idx === 2) {
+        if (statusTag) statusTag.textContent = '即時類比運算';
+        const ldrSlider = document.getElementById('sim-ldr-slider');
+        updateLdrSim(ldrSlider ? ldrSlider.value : 330);
+      } else if (idx === 3) {
+        if (statusTag) statusTag.textContent = '即時測距感測';
+        radarSoundOn = false;
+        const sndBtn = document.getElementById('sim-radar-sound-btn');
+        if (sndBtn) {
+          sndBtn.textContent = '開啟警報嗶聲';
+          sndBtn.classList.remove('is-active');
+        }
+        const distSlider = document.getElementById('sim-radar-dist');
+        updateRadarSim(distSlider ? distSlider.value : 35);
+      } else if (idx === 4) {
+        if (statusTag) statusTag.textContent = '警戒系統待機';
+        pirArmed = true;
+        pirTriggered = false;
+        updatePirUI();
+      }
+    }
+
+    /* Lab 1 helpers */
+    let trafficPaused = false;
+    function updateTrafficLightsUI() {
+      const r = document.getElementById('sim-tl-red');
+      const y = document.getElementById('sim-tl-yellow');
+      const g = document.getElementById('sim-tl-green');
+      const txt = document.getElementById('sim-tl-text');
+      if (!r || !y || !g || !txt) return;
+
+      r.setAttribute('fill', 'var(--led-off)');
+      y.setAttribute('fill', 'var(--led-off)');
+      g.setAttribute('fill', 'var(--led-off)');
+
+      if (trafficPhase === 0) {
+        g.setAttribute('fill', 'var(--led-green-on)');
+        txt.textContent = '綠燈通行中 (Pin 11 HIGH)';
+      } else if (trafficPhase === 1 || trafficPhase === 3) {
+        g.setAttribute('fill', 'var(--led-off)');
+        txt.textContent = '綠燈即將結束 — 閃爍提醒！';
+      } else if (trafficPhase === 2) {
+        g.setAttribute('fill', 'var(--led-green-on)');
+        txt.textContent = '綠燈即將結束 — 閃爍提醒！';
+      } else if (trafficPhase === 4) {
+        y.setAttribute('fill', 'var(--led-yellow-on)');
+        txt.textContent = '黃燈緩衝警告 (Pin 12 HIGH)';
+      } else {
+        r.setAttribute('fill', 'var(--led-red-on)');
+        txt.textContent = '紅燈停止通行 (Pin 13 HIGH)';
+      }
+    }
+
+    function startTrafficLoop(intervalMs) {
+      if (trafficInterval) clearInterval(trafficInterval);
+      let tick = 0;
+      trafficInterval = setInterval(function () {
+        if (trafficPaused) return;
+        tick++;
+        if (trafficPedestrianReq && trafficPhase === 0) {
+          trafficPedestrianReq = false;
+          trafficPhase = 1;
+          tick = 0;
+        } else if (trafficPhase === 0 && tick >= 3) {
+          trafficPhase = 1; tick = 0;
+        } else if (trafficPhase >= 1 && trafficPhase <= 3) {
+          trafficPhase++; tick = 0;
+        } else if (trafficPhase === 4 && tick >= 2) {
+          trafficPhase = 5; tick = 0;
+        } else if (trafficPhase === 5 && tick >= 3) {
+          trafficPhase = 0; tick = 0;
+        }
+        updateTrafficLightsUI();
+      }, intervalMs);
+    }
+
+    function updateTrafficSpeed(val) {
+      const lbl = document.getElementById('sim-tl-speed-lbl');
+      if (lbl) lbl.textContent = parseFloat(val).toFixed(1) + 'x';
+      startTrafficLoop(Math.round(900 / parseFloat(val)));
+    }
+
+    function triggerPedestrianBtn() {
+      trafficPedestrianReq = true;
+      const txt = document.getElementById('sim-tl-text');
+      if (txt && trafficPhase === 0) {
+        txt.textContent = '已收到行人請求！即將轉為閃爍換燈...';
+      }
+    }
+
+    function toggleTrafficPause() {
+      trafficPaused = !trafficPaused;
+      const btn = document.getElementById('sim-tl-pause-btn');
+      if (btn) btn.textContent = trafficPaused ? '繼續循環' : '暫停循環';
+    }
+
+    /* Lab 2 helpers */
+    const PIANO_KEYS = [
+      [262, 'Do (C4)', 'Pin 2'],
+      [294, 'Re (D4)', 'Pin 3'],
+      [330, 'Mi (E4)', 'Pin 4'],
+      [349, 'Fa (F4)', 'Pin 5']
+    ];
+
+    function playPianoKey(idx) {
+      const k = PIANO_KEYS[idx];
+      if (k) playPianoNote(k[0], k[1], k[2]);
+    }
+
+    function playPianoNote(freq, name, pin) {
+      playToneBurst(freq, 260, 'square');
+      const fEl = document.getElementById('sim-piano-freq');
+      const lEl = document.getElementById('sim-piano-led');
+      if (fEl) fEl.textContent = `${freq} Hz — ${name} (${pin} LOW)`;
+      if (lEl) lEl.setAttribute('fill', 'var(--led-red-on)');
+      setTimeout(function () {
+        if (lEl) lEl.setAttribute('fill', 'var(--led-off)');
+      }, 240);
+    }
+
+    function playDemoMelody() {
+      const notes = [
+        [262, 'Do (C4)', 'Pin 2'],
+        [262, 'Do (C4)', 'Pin 2'],
+        [392, 'So (G4)', 'Demo'],
+        [392, 'So (G4)', 'Demo'],
+        [440, 'La (A4)', 'Demo'],
+        [440, 'La (A4)', 'Demo'],
+        [392, 'So (G4)', 'Demo']
+      ];
+      notes.forEach(function (n, i) {
+        setTimeout(function () {
+          playPianoNote(n[0], n[1], n[2]);
+        }, i * 320);
+      });
+    }
+
+    /* Lab 3 helpers */
+    function updateLdrSim(val) {
+      const raw = parseInt(val, 10);
+      let pwm = Math.round(((raw - 150) * (0 - 255)) / (850 - 150) + 255);
+      pwm = Math.max(0, Math.min(255, pwm));
+      const pct = Math.round((pwm / 255) * 100);
+
+      const envLbl = document.getElementById('sim-ldr-env-lbl');
+      const rawEl = document.getElementById('sim-ldr-raw');
+      const pwmEl = document.getElementById('sim-ldr-pwm');
+      const pctEl = document.getElementById('sim-ldr-pct');
+      const pwmLbl = document.getElementById('sim-ldr-pwm-lbl');
+      const serialEl = document.getElementById('sim-ldr-serial');
+      const bulb = document.getElementById('sim-ldr-bulb');
+      const glow = document.getElementById('sim-ldr-glow');
+
+      if (envLbl) {
+        if (raw < 250) envLbl.textContent = '深夜全黑';
+        else if (raw < 550) envLbl.textContent = '傍晚昏暗';
+        else envLbl.textContent = '白天明亮';
+      }
+      if (rawEl) rawEl.textContent = String(raw);
+      if (pwmEl) pwmEl.textContent = String(pwm);
+      if (pctEl) pctEl.textContent = pct + '%';
+      if (pwmLbl) pwmLbl.textContent = `PWM: ${pwm} / 255`;
+      if (serialEl) serialEl.textContent = `Serial Monitor > Light: ${raw} | Brightness PWM: ${pwm}`;
+      if (bulb) bulb.setAttribute('fill', pwm > 10 ? 'var(--led-yellow-on)' : 'var(--led-off)');
+      if (glow) glow.setAttribute('opacity', String((pwm / 255 * 0.85).toFixed(2)));
+    }
+
+    /* Lab 4 helpers */
+    let radarSoundOn = false;
+    let currentRadarDist = 35;
+
+    function updateRadarSim(val) {
+      currentRadarDist = parseInt(val, 10);
+      const us = Math.round((currentRadarDist * 2) / 0.034);
+      const xPos = Math.round(70 + (currentRadarDist / 100) * 230);
+
+      const cmLbl = document.getElementById('sim-radar-cm-lbl');
+      const cmEl = document.getElementById('sim-radar-cm');
+      const usEl = document.getElementById('sim-radar-us');
+      const wall = document.getElementById('sim-radar-wall');
+      const beam = document.getElementById('sim-radar-beam');
+      const g = document.getElementById('sim-radar-g');
+      const y = document.getElementById('sim-radar-y');
+      const r = document.getElementById('sim-radar-r');
+
+      if (cmLbl) cmLbl.textContent = currentRadarDist + ' cm';
+      if (cmEl) cmEl.textContent = currentRadarDist.toFixed(1) + ' cm';
+      if (usEl) usEl.textContent = us + ' µs';
+      if (wall) wall.setAttribute('transform', `translate(${xPos}, 20)`);
+      if (beam) beam.setAttribute('x2', String(xPos));
+
+      if (g && y && r) {
+        g.setAttribute('fill', currentRadarDist > 50 ? 'var(--led-green-on)' : 'var(--led-off)');
+        y.setAttribute('fill', (currentRadarDist >= 20 && currentRadarDist <= 50) ? 'var(--led-yellow-on)' : 'var(--led-off)');
+        r.setAttribute('fill', currentRadarDist < 20 ? 'var(--led-red-on)' : 'var(--led-off)');
+      }
+
+      if (radarSoundOn) {
+        restartRadarBeepLoop();
+      }
+    }
+
+    function restartRadarBeepLoop() {
+      if (radarBeepTimer) { clearInterval(radarBeepTimer); radarBeepTimer = null; }
+      if (!radarSoundOn) return;
+      if (currentRadarDist < 20) {
+        radarBeepTimer = setInterval(function () { playToneBurst(1200, 70, 'square'); }, 180);
+      } else if (currentRadarDist <= 50) {
+        radarBeepTimer = setInterval(function () { playToneBurst(700, 90, 'square'); }, 520);
+      }
+    }
+
+    function toggleRadarSound() {
+      radarSoundOn = !radarSoundOn;
+      const btn = document.getElementById('sim-radar-sound-btn');
+      if (btn) {
+        btn.textContent = radarSoundOn ? '靜音關閉' : '開啟警報嗶聲';
+        btn.classList.toggle('is-active', radarSoundOn);
+      }
+      if (radarSoundOn) {
+        ensureAudioCtx();
+        restartRadarBeepLoop();
+      } else if (radarBeepTimer) {
+        clearInterval(radarBeepTimer);
+        radarBeepTimer = null;
+      }
+    }
+
+    /* Lab 5 helpers */
+    let pirArmed = true;
+    let pirTriggered = false;
+    let pirFlip = false;
+
+    function updatePirUI() {
+      const armTag = document.getElementById('sim-pir-arm-tag');
+      const moveBtn = document.getElementById('sim-pir-move-btn');
+      const logEl = document.getElementById('sim-pir-log');
+      const statusTag = document.getElementById('sim-status-tag');
+      const rLed = document.getElementById('sim-pir-led-r');
+      const bLed = document.getElementById('sim-pir-led-b');
+
+      if (armTag) {
+        armTag.textContent = pirArmed ? '已布防 (Armed)' : '已撤防 (Standby)';
+        armTag.className = pirArmed ? 'tag tag-yellow' : 'tag';
+      }
+      if (moveBtn) {
+        moveBtn.textContent = pirTriggered ? '人員離開感應區' : '模擬有人員走入感應區';
+      }
+
+      if (alarmTimer) { clearInterval(alarmTimer); alarmTimer = null; }
+
+      if (pirArmed && pirTriggered) {
+        if (statusTag) statusTag.textContent = '警報觸發中！';
+        if (logEl) logEl.textContent = '[ALERT] PIR Pin 2 = HIGH！偵測到人體紅外線移動，聲光警報啟動中！';
+        alarmTimer = setInterval(function () {
+          pirFlip = !pirFlip;
+          if (rLed) rLed.setAttribute('fill', pirFlip ? 'var(--led-red-on)' : 'var(--led-off)');
+          if (bLed) bLed.setAttribute('fill', !pirFlip ? 'var(--led-blue-on)' : 'var(--led-off)');
+          playToneBurst(pirFlip ? 880 : 660, 140, 'square');
+        }, 220);
+      } else {
+        if (rLed) rLed.setAttribute('fill', 'var(--led-off)');
+        if (bLed) bLed.setAttribute('fill', 'var(--led-off)');
+        if (statusTag) statusTag.textContent = pirArmed ? '警戒監視中' : '系統撤防待機';
+        if (logEl) {
+          logEl.textContent = pirArmed
+            ? '[Serial] 系統警戒中，目前無人移動 (PIR LOW)。'
+            : '[Serial] 系統已撤防：即使有人經過也不會觸發警報。';
+        }
+      }
+    }
+
+    function togglePirArm() {
+      pirArmed = !pirArmed;
+      updatePirUI();
+    }
+
+    function togglePirIntruder() {
+      ensureAudioCtx();
+      pirTriggered = !pirTriggered;
+      updatePirUI();
+    }
+
+    /* ================================================================
+       PART 05: INTERACTIVE QUIZ
+       ================================================================ */
+    const QUIZ_DATA = [
+      {
+        q: `1. 使用 Arduino Uno 數位腳位（5V）點亮一顆紅光 LED（壓降 2V），若想要把電流控制在約 13–15 mA 安全範圍，最常串聯哪一種電阻？`,
+        options: [`220 Ω`, `10 Ω`, `100 kΩ`, `不需要電阻`],
+        answer: 0,
+        explain: `依歐姆定律 I = (5V - 2V) / 220Ω ≈ 13.6 mA，剛好在 LED 與 Arduino 腳位安全電流範圍內！`
+      },
+      {
+        q: `2. 關於麵包板（Breadboard）內部銅片的導通方向，下列敘述何者正確？`,
+        options: [
+          `整個板子所有孔位全部相通`,
+          `上下「+ / -」電源軌水平整排相通；中央 a–e 直行 5 孔垂直相通`,
+          `中央溝槽上下兩側（e 與 f）是連通的`,
+          `每一個孔洞底下都彼此完全絕緣`
+        ],
+        answer: 1,
+        explain: `電源軌是橫向（水平）整排連通供電源分接；中間插槽則是直向每 5 孔相通，並被中央溝槽上下隔離。`
+      },
+      {
+        q: `3. 在實驗三「光控小夜燈」中，必須把 LED 接在標有「~」符號的腳位（如 ~9）才能實現調光，這個「~」代表什麼功能？`,
+        options: [
+          `高速網路傳輸`,
+          `交流電 (AC) 輸入`,
+          `PWM（脈衝寬度調變），支援 analogWrite(0–255)`,
+          `僅供類比讀取使用`
+        ],
+        answer: 2,
+        explain: `Arduino Uno 數位腳位 3, 5, 6, 9, 10, 11 支援 PWM，能透過極快速開關比例調節輸出平均功率，實現 LED 調光。`
+      },
+      {
+        q: `4. HC-SR04 超音波感測器量測到 Echo 高電位時間為 1000 微秒（µs），若空氣音速為 0.034 cm/µs，障礙物距離感測器大約幾公分？`,
+        options: [`34 公分`, `17 公分`, `68 公分`, `3.4 公分`],
+        answer: 1,
+        explain: `因為聲波經過「去程 + 回程」兩倍距離，所以 dist = 1000 × 0.034 ÷ 2 = 17 公分！`
+      },
+      {
+        q: `5. 當按鈕開關採用 pinMode(2, INPUT_PULLUP) 接至 GND 時，在「未按下」的狀態下，digitalRead(2) 會讀到什麼結果？`,
+        options: [`HIGH`, `LOW`, `512`, `會立刻短路`] ,
+        answer: 0,
+        explain: `INPUT_PULLUP 啟用內部電阻將腳位拉往 5V，因此未按下時讀為 HIGH；當按下接通 GND 時才會變成 LOW。`
+      }
+    ];
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      if (!container) return;
+      container.innerHTML = QUIZ_DATA.map(function (q, qIdx) {
+        const chosen = APP_STATE.quizAnswers[qIdx];
+        const hasAnswered = (typeof chosen === 'number');
+        const optsHtml = q.options.map(function (optText, oIdx) {
+          let cls = 'btn quiz-opt';
+          if (hasAnswered) {
+            if (oIdx === q.answer) cls += ' is-correct';
+            else if (oIdx === chosen) cls += ' is-wrong';
+          }
+          return `<button type="button" class="${cls}" onclick="answerQuiz(${qIdx}, ${oIdx})">${optText}</button>`;
+        }).join('');
+
+        let feedbackHtml = '';
+        if (hasAnswered) {
+          const isRight = (chosen === q.answer);
+          feedbackHtml = `<div class="status-banner ${isRight ? 'status-safe' : 'status-warn'}" style="margin-top: var(--space-md);">
+            <span><strong>${isRight ? '答對了！' : '再想一下：'}</strong>${q.explain}</span>
+          </div>`;
+        }
+
+        return `<article class="block">
+          <h3 style="font-size: 1.15rem; margin-bottom: var(--space-sm);">${q.q}</h3>
+          <div class="quiz-options">${optsHtml}</div>
+          ${feedbackHtml}
+        </article>`;
+      }).join('');
+    }
+
+    function answerQuiz(qIdx, oIdx) {
+      APP_STATE.quizAnswers[qIdx] = oIdx;
+      renderQuiz();
+      updateProgressUI();
+      saveAppState();
+    }
+
+    /* Keyboard support for Piano Lab (Keys 1-4) */
+    document.addEventListener('keydown', function (e) {
+      if (APP_STATE.activeLabIndex !== 1) return;
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT')) return;
+      if (e.key === '1') playPianoNote(262, 'Do (C4)', 'Pin 2');
+      else if (e.key === '2') playPianoNote(294, 'Re (D4)', 'Pin 3');
+      else if (e.key === '3') playPianoNote(330, 'Mi (E4)', 'Pin 4');
+      else if (e.key === '4') playPianoNote(349, 'Fa (F4)', 'Pin 5');
+    });
+
+    /* ================================================================
+       APP INIT
+       ================================================================ */
+    async function initApp() {
+      buildBreadboardHoles();
+      updateOhmSim();
+      selectBreadboardZone('power');
+      selectUnoPart('usb');
+      renderLifecycleState();
+
+      if (window.notebookAppApi && typeof window.notebookAppApi.getAppState === 'function') {
+        try {
+          const saved = await window.notebookAppApi.getAppState();
+          if (saved && typeof saved === 'object') {
+            if (Array.isArray(saved.completedLabs)) APP_STATE.completedLabs = saved.completedLabs;
+            if (typeof saved.activeLabIndex === 'number') APP_STATE.activeLabIndex = saved.activeLabIndex;
+            if (typeof saved.activeSensorId === 'string' && SENSORS_DATA[saved.activeSensorId]) {
+              APP_STATE.activeSensorId = saved.activeSensorId;
+            }
+            if (saved.quizAnswers && typeof saved.quizAnswers === 'object') {
+              APP_STATE.quizAnswers = saved.quizAnswers;
+            }
+          }
+        } catch (err) {
+          // Ignore load error
+        }
+      }
+
+      selectSensor(APP_STATE.activeSensorId);
+      selectLab(APP_STATE.activeLabIndex);
+      renderQuiz();
+      updateProgressUI();
+
+      if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
+
+      if (window.notebookAppApi && typeof window.notebookAppApi.notifyAppReady === 'function') {
+        window.notebookAppApi.notifyAppReady();
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>
